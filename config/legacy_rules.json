@@ -1,0 +1,22 @@
+{
+  "source_file_title": "拠点戦まとめ_鯖統合 の編集用",
+  "timezone_recommended": "Asia/Tokyo",
+  "sentinel_winner": "x",
+  "holding_none_display": "-",
+  "regular_expected_winner_counts": {
+    "mon": 10,
+    "thu": 9,
+    "fri": 8,
+    "sun": 8
+  },
+  "siege_expected_winner_counts": {
+    "sat": 2
+  },
+  "release_search_window_days": 6,
+  "fallback_release_days_after_acquisition": 7,
+  "legacy_tax_rule": "previous release date to current acquisition date; sentinel x adds 7 to previous tax",
+  "notes": [
+    "Do not treat #N/A as a generic failure; legacy workbook uses it for unresolved future state.",
+    "Use explicit completion state in the web app instead of spreadsheet errors."
+  ]
+}

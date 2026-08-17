@@ -1,0 +1,38 @@
+{
+  "db_winner_lookup_3A": {
+    "cell": "DB!C16",
+    "formula": "XLOOKUP($A16,'入力'!$A:$A,'入力'!C:C)"
+  },
+  "db_battle_count_3A": {
+    "cell": "DB!E16",
+    "formula": "XLOOKUP($A16,'入力'!$A:$A,'入力'!D:D)"
+  },
+  "db_tax_3A": {
+    "cell": "DB!G16",
+    "formula": "ifs(I9=0,\"\",C9=\"x\",G9+7,true,$A16-I9)"
+  },
+  "db_holding_days_3A": {
+    "cell": "DB!H16",
+    "formula": "IFS(I16=0,\"\",C16=\"x\",\"x\",true,I16-$A16)"
+  },
+  "db_release_date_3A": {
+    "cell": "DB!I16",
+    "formula": "IFS(C16=\"x\",\"x\",IFERROR(COUNTIF($CF17:$CP17,C16)=1,0),$A17,IFERROR(COUNTIF($CF18:$CP18,C16)=1,0),$A18,IFERROR(COUNTIF($CF19:$CP19,C16)=1,0),$A19,IFERROR(COUNTIF($CF20:$CP20,C16)=1,0),$A20,IFERROR(COUNTIF($CF21:$CP21,C16)=1,0),$A21,IFERROR(COUNTIF($CF22:$CP22,C16)=1,0),$A22,$CE22,$A23,TRUE,NA())"
+  },
+  "db_input_complete_thu": {
+    "cell": "DB!CE16",
+    "formula": "counta(CF16:CS16)=9"
+  },
+  "db_release_list_thu": {
+    "cell": "DB!CF16",
+    "formula": "HSTACK(C16,J16,Q16,Y16,AG16,AO16,AW16,BE16,BM16,BU16)"
+  },
+  "db_input_complete_sat": {
+    "cell": "DB!CE18",
+    "formula": "IFERROR(and(CC18<>\"\",CD18<>\"\"),false)"
+  },
+  "db_release_list_sat": {
+    "cell": "DB!CF18",
+    "formula": "hstack(CC18,CD18)"
+  }
+}

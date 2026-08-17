@@ -1,0 +1,150 @@
+{
+  "sun": [
+    {
+      "slot": "3A",
+      "node_name": "デルニール農場"
+    },
+    {
+      "slot": "2A",
+      "node_name": "略奪の森"
+    },
+    {
+      "slot": "2B",
+      "node_name": "忘却の地"
+    },
+    {
+      "slot": "1A",
+      "node_name": "ナーガ沼地"
+    },
+    {
+      "slot": "1B",
+      "node_name": "旧ダンデリオン"
+    },
+    {
+      "slot": "1C",
+      "node_name": "捨てられた地"
+    },
+    {
+      "slot": "1D",
+      "node_name": "ベア川下流"
+    },
+    {
+      "slot": "1E",
+      "node_name": "アルティノ入り口"
+    }
+  ],
+  "mon": [
+    {
+      "slot": "3A",
+      "node_name": "ルツム族駐屯地"
+    },
+    {
+      "slot": "3B",
+      "node_name": "アト農場"
+    },
+    {
+      "slot": "2A",
+      "node_name": "ベリア農場地帯"
+    },
+    {
+      "slot": "2B",
+      "node_name": "ギュントの丘"
+    },
+    {
+      "slot": "2C",
+      "node_name": "高原地帯"
+    },
+    {
+      "slot": "1A",
+      "node_name": "隠遁の森"
+    },
+    {
+      "slot": "1B",
+      "node_name": "エワズの丘"
+    },
+    {
+      "slot": "1C",
+      "node_name": "廃城跡入り口"
+    },
+    {
+      "slot": "1D",
+      "node_name": "カイア渡し場"
+    },
+    {
+      "slot": "1E",
+      "node_name": "カズラ農場"
+    }
+  ],
+  "thu": [
+    {
+      "slot": "3A",
+      "node_name": "北部大農場"
+    },
+    {
+      "slot": "2A",
+      "node_name": "トロル防御基地"
+    },
+    {
+      "slot": "2B",
+      "node_name": "隠された修道院"
+    },
+    {
+      "slot": "2C",
+      "node_name": "マルニの第2実験場"
+    },
+    {
+      "slot": "1A",
+      "node_name": "アグリス平原"
+    },
+    {
+      "slot": "1B",
+      "node_name": "リンチ農場廃墟"
+    },
+    {
+      "slot": "1C",
+      "node_name": "ブレディー砦"
+    },
+    {
+      "slot": "1D",
+      "node_name": "エントの森"
+    },
+    {
+      "slot": "1E",
+      "node_name": "クリオ村"
+    }
+  ],
+  "fri": [
+    {
+      "slot": "3A",
+      "node_name": "アグリス祭壇"
+    },
+    {
+      "slot": "2A",
+      "node_name": "ナーガ抽出場"
+    },
+    {
+      "slot": "2B",
+      "node_name": "オークキャンプ"
+    },
+    {
+      "slot": "1A",
+      "node_name": "北部採石場"
+    },
+    {
+      "slot": "1B",
+      "node_name": "ハーピーの絶壁"
+    },
+    {
+      "slot": "1C",
+      "node_name": "ブリの森"
+    },
+    {
+      "slot": "1D",
+      "node_name": "マンシャの森の奥"
+    },
+    {
+      "slot": "1E",
+      "node_name": "廃鉄鉱山採掘場"
+    }
+  ]
+}

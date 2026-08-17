@@ -1,0 +1,10 @@
+﻿severity,type,source,detail
+info,partial_input_without_node_mapping,入力!row190,2026-02-18 水 slot=1B has non-winner input only; review if this is a stray value.
+warning,weekday_conflict_master_vs_input,計算用!R4:Z4,アト農場: 計算用=水 / 入力レイアウト=月 (3B)
+warning,weekday_conflict_master_vs_input,計算用!R9:Z9,略奪の森: 計算用=水 / 入力レイアウト=日 (2A)
+warning,weekday_conflict_master_vs_input,計算用!R12:Z12,高原地帯: 計算用=日 / 入力レイアウト=月 (2C)
+warning,weekday_conflict_master_vs_input,計算用!R14:Z14,マルニの第2実験場: 計算用=水 / 入力レイアウト=木 (2C)
+warning,weekday_conflict_master_vs_input,計算用!R19:Z19,旧ダンデリオン: 計算用=水 / 入力レイアウト=日 (1B)
+warning,weekday_conflict_master_vs_input,計算用!R24:Z24,カイア渡し場: 計算用=水 / 入力レイアウト=月 (1D)
+warning,weekday_conflict_master_vs_input,計算用!R29:Z29,エントの森: 計算用=水 / 入力レイアウト=木 (1D)
+warning,weekday_conflict_master_vs_input,計算用!R34:Z34,廃鉄鉱山採掘場: 計算用=水 / 入力レイアウト=金 (1E)

@@ -1,0 +1,24 @@
+{
+  "generated_at_jst": "2026-08-17T14:34:00+09:00",
+  "source_sha256": "c762cbc4bf7a099e06bd864a96a71c61ac8beee4e6e8615386ec4ecfaf80df53",
+  "source_size_bytes": 1156318,
+  "counts": {
+    "guild_master": 102,
+    "node_master": 35,
+    "input_slot_mapping": 35,
+    "regular_battles_normalized": 1791,
+    "regular_partial_inputs": 52,
+    "siege_battles_normalized": 58,
+    "legacy_expected_results": 1791,
+    "audit_items": 9
+  },
+  "last_result_winner_date": "2026-08-16",
+  "last_any_input_date": "2026-08-23",
+  "known_weekday_conflicts": 8,
+  "read_first": [
+    "README_FIRST.md",
+    "CLAUDE_BUILD_PROMPT.md",
+    "docs/02_business_rules.md",
+    "docs/05_migration_questions.md"
+  ]
+}

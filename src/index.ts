@@ -376,6 +376,32 @@ router.get("/export/initial-template.csv", async (c) => {
   });
 });
 
+// 「2026/8/10」「2026-8-10」やExcelのシリアル値など、YYYY-MM-DD以外で
+// 入力された日付をYYYY-MM-DDに正規化する。計算コア(calc.ts)はYYYY-MM-DD形式しか
+// 認識しないため、ここで揃えないと日付がずれて税・保有日数が空欄のまま計算されない。
+function normalizeDate(raw: string): string | null {
+  const s = raw.trim();
+  if (!s) return null;
+  let m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s);
+  if (!m) m = /^(\d{4})\/(\d{1,2})\/(\d{1,2})/.exec(s);
+  if (m) {
+    const y = m[1], mo = m[2].padStart(2, "0"), da = m[3].padStart(2, "0");
+    const d = new Date(Date.UTC(Number(y), Number(mo) - 1, Number(da)));
+    if (d.getUTCFullYear() !== Number(y) || d.getUTCMonth() !== Number(mo) - 1) return null;
+    return `${y}-${mo}-${da}`;
+  }
+  // Excelのシリアル値（1900年1月1日を1とする数値）
+  if (/^\d{4,6}$/.test(s)) {
+    const serial = Number(s);
+    const ms = Date.UTC(1899, 11, 30) + serial * 86400000;
+    const d = new Date(ms);
+    if (!Number.isNaN(d.getTime())) {
+      return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+    }
+  }
+  return null;
+}
+
 // 埋めたテンプレートCSVを貼り付けて一括登録。拠点名・ギルド名は登録済みの名前と完全一致で照合する。
 // これは運用開始時の最初の1回だけ使う。それ以降は週次ボードの入力がそのまま反映される。
 router.post("/api/initial-holding/import", async (c) => {
@@ -407,14 +433,18 @@ router.post("/api/initial-holding/import", async (c) => {
     const nodeId = nodeByName.get(nodeName);
     if (!nodeId) { errors.push(`拠点「${nodeName}」が見つかりません`); skipped++; continue; }
     const guildName = guildIdx >= 0 ? (r[guildIdx] ?? "").trim() : "";
-    const acquired = acqIdx >= 0 ? (r[acqIdx] ?? "").trim() : "";
-    const released = relIdx >= 0 ? (r[relIdx] ?? "").trim() : "";
-    if (!guildName && !released) { skipped++; continue; }  // 何も入力されていない行はスキップ
+    const acquiredRaw = acqIdx >= 0 ? (r[acqIdx] ?? "").trim() : "";
+    const releasedRaw = relIdx >= 0 ? (r[relIdx] ?? "").trim() : "";
+    if (!guildName && !releasedRaw) { skipped++; continue; }  // 何も入力されていない行はスキップ
     let guildId: number | null = null;
     if (guildName) {
       guildId = guildByName.get(guildName) ?? null;
       if (guildId === null) { errors.push(`「${nodeName}」のギルド「${guildName}」が見つかりません`); skipped++; continue; }
     }
+    const acquired = acquiredRaw ? normalizeDate(acquiredRaw) : null;
+    const released = releasedRaw ? normalizeDate(releasedRaw) : null;
+    if (acquiredRaw && !acquired) errors.push(`「${nodeName}」の獲得日「${acquiredRaw}」を読み取れません（YYYY-MM-DD形式で入力してください）`);
+    if (releasedRaw && !released) errors.push(`「${nodeName}」の前回放棄日「${releasedRaw}」を読み取れません（YYYY-MM-DD形式で入力してください）`);
     statements.push(c.env.DB.prepare(
       "INSERT INTO initial_holdings (node_id, guild_id, acquired_date, last_released_date)" +
       " VALUES (?, ?, ?, ?)" +

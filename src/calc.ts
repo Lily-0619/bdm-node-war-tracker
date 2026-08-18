@@ -10,6 +10,9 @@
  *              b) そのギルドが他の拠点で勝った日（＝移動して手放した）
  *   保有日数 … 放棄日（未放棄なら今日） − 獲得日
  *   税(空席日数) … 前回の放棄日 → 今回の獲得日 までの日数。長いほど勝ったときの利益が大きい。
+ *
+ * 週が変わったとき: その拠点の開催曜日で「前回の開催予定日」を過ぎても勝ったギルドが
+ * 記入されていなければ、その開催予定日をもって手放したものとして扱い、空席にする。
  */
 
 export type Tier = "1" | "2" | "3" | "castle";
@@ -21,6 +24,10 @@ export const WEEKDAY_JA: Record<string, string> = {
   mon: "月", tue: "火", wed: "水", thu: "木", fri: "金", sat: "土", sun: "日",
 };
 export const PY_WEEKDAY_KEY = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+/** 月曜日からの日数オフセット。週の切り替わり判定に使う。 */
+export const WEEKDAY_OFFSET: Record<string, number> = {
+  mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6,
+};
 
 export function tierRank(tier: string): number {
   return TIER_RANK[tier] ?? 0;
@@ -220,6 +227,24 @@ export class Ledger {
       occ.vacancyDays = daysBetween(occ.acquired, prevRelease);
 
       if (occ.battleId !== null) this.battleResult.set(occ.battleId, occ);
+    }
+
+    // 週が変わったのに、前回開催分（先週分）の勝ったギルドが記入されていない場合は空席にする。
+    // その拠点の開催曜日ぶんだけ「前回の開催予定日」を求め、今の保有者がそれより前から
+    // 更新されていなければ、前回の開催予定日をもって手放したものとして扱う。
+    if (seq.length) {
+      const lastOcc = seq[seq.length - 1];
+      if (lastOcc.released === null) {
+        const node = this.nodeById.get(nodeId);
+        const offset = node ? WEEKDAY_OFFSET[node.weekday] : undefined;
+        if (offset !== undefined) {
+          const lastScheduled = addDays(weekStart(this.today), offset - 7);
+          if (lastOcc.acquired < lastScheduled) {
+            lastOcc.released = lastScheduled;
+            lastOcc.holdingDays = clamp0(daysBetween(lastOcc.released, lastOcc.acquired));
+          }
+        }
+      }
     }
 
     const state: NodeState = {

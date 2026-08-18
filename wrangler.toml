@@ -1,0 +1,21 @@
+name = "kyoten-tax-board"
+main = "src/index.ts"
+compatibility_date = "2025-07-01"
+
+# 静的ファイル（app.css / app.js）
+[assets]
+directory = "./public"
+
+# D1（database_id は `wrangler d1 create kyoten` の出力を貼る）
+[[d1_databases]]
+binding = "DB"
+database_name = "kyoten"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[vars]
+# 日本時間で「今日」を判定する
+APP_TIMEZONE_OFFSET = "9"
+
+# 編集用パスワードは secret で設定する:
+#   npx wrangler secret put EDIT_PASSWORD
+# 未設定の場合は誰でも編集できる状態になる。

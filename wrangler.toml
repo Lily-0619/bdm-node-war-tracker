@@ -10,7 +10,7 @@ directory = "./public"
 [[d1_databases]]
 binding = "DB"
 database_name = "kyoten"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "0b879171-b465-4c5d-9e4d-f5d407f7f90a"
 
 [vars]
 # 日本時間で「今日」を判定する

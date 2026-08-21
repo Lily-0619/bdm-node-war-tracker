@@ -274,6 +274,18 @@ export class Ledger {
     };
   }
 
+  /**
+   * 指定した日の時点でその拠点を保有していたギルド。
+   * 週次ボードの「保有ギルド」（その週が始まった時点の保有者）を後から引くのに使う。
+   */
+  holderAt(nodeId: number, iso: string): Occupation | null {
+    const occs = this.states.get(nodeId)?.occupations ?? [];
+    for (const o of occs) {
+      if (o.acquired <= iso && (o.released === null || o.released > iso)) return o;
+    }
+    return null;
+  }
+
   /** ギルドID -> いま保有している拠点ID */
   guildHeldNode(): Map<number, number> {
     const out = new Map<number, number>();

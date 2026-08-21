@@ -32,7 +32,9 @@ function boardRowHtml(r: BoardRow, date: string, canEdit: boolean): string {
   <td class="c">${r.fortress ? "城" : "-"}</td>
   <td class="c">${r.bidSlots ?? "-"}</td>
   <td class="c">${r.capacity ?? "-"}</td>
-  <td class="holder${r.isVacant ? " vacant" : ""}">${esc(r.holder || "（空席）")}</td>
+  <td class="holder${r.isVacant ? " vacant" : ""}${r.isUndetermined ? " undecided" : ""}">${
+    r.isUndetermined ? "未定" : esc(r.holder || "（空席）")
+  }</td>
   <td class="c">${num(r.holdingDays)}</td>
   <td class="tax ${r.heat}">${num(r.vacancyDays)}</td>
   <td class="in c"><input type="checkbox" class="chk f-unified"${r.unified ? " checked" : ""}${ro}></td>
@@ -51,7 +53,7 @@ function dayHtml(day: Week["days"][number], canEdit: boolean): string {
   <th rowspan="2">${day.isCastleDay ? "城" : "拠点"}</th>
   <th rowspan="2">級</th><th rowspan="2">時</th><th rowspan="2">塞</th>
   <th rowspan="2">枠</th><th rowspan="2">人数</th>
-  <th rowspan="2" class="holdgrp">いま保有しているギルド</th>
+  <th rowspan="2" class="holdgrp">保有ギルド</th>
   <th rowspan="2" class="holdgrp">保有<br><span class="mini">日数</span></th>
   <th rowspan="2" class="holdgrp">税<br><span class="mini">空席日数</span></th>
   <th class="ingrp" colspan="4">▼ 入力する欄</th>

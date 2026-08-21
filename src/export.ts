@@ -78,6 +78,8 @@ export function fullWorkbook(inp: ExportInput): Uint8Array {
     const wd = weekdayKey(b.battle_date);
     const cellS = WEEKDAY_STYLE[wd] ?? S.CELL;
     const centerS = WEEKDAY_STYLE_CENTER[wd] ?? S.CENTER;
+    // 「保有ギルド」はその戦が属する週が始まった時点の保有者（週の途中では書き換わらない）
+    const heldAtWeekStart = ledger.holderAt(b.node_id, weekStart(b.battle_date));
     const base: Row = [
       { v: WEEKDAY_JA[wd], s: centerS },
       { v: b.battle_date, s: cellS },
@@ -87,7 +89,7 @@ export function fullWorkbook(inp: ExportInput): Uint8Array {
       { v: node.fortress ? "城塞" : "", s: centerS },
       { v: b.banquet ? "宴会" : "", s: centerS },
       { v: b.unified ? "統一" : "", s: centerS },
-      { v: ledger.state(b.node_id).holderName || "（空席）", s: cellS },
+      { v: heldAtWeekStart?.guildName || "（空席）", s: cellS },
       { v: (partsByBattle.get(b.id) ?? []).join("、"), s: cellS },
       { v: b.winner_guild_id ? ledger.guildNames.get(b.winner_guild_id) ?? "" : "", s: cellS },
     ];

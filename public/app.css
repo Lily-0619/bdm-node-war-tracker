@@ -61,6 +61,7 @@ table.xl th.ingrp{background:#f6efd0;color:#7a6516;border-bottom:2px solid var(-
 table.xl th.holdgrp{background:#e7eef3;color:#33566b;border-bottom:2px solid #9dbccf;}
 table.xl td.holder{font-weight:700;background:#f4f9fc;}
 table.xl td.holder.vacant{font-weight:400;color:#999;background:#fafafa;}
+table.xl td.holder.undecided{font-weight:400;color:#b0872c;background:#fffbf0;font-style:italic;}
 table.xl tr:hover td.holder{background:#eaf4fa;}
 table.xl td{border:1px solid var(--grid-soft);padding:2px 6px;white-space:nowrap;height:26px;}
 table.xl td.node{font-weight:600;}

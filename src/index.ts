@@ -95,12 +95,21 @@ router.get("/", async (c) => {
 
   const { nodes, guilds, battles, initials } = await loadAll(env);
   const parts = await loadParticipants(env, monday, addDays(monday, 6));
+  // 右側の税収ランキング・保有サマリは「いまの最新状態」で見せる
   const ledger = new Ledger(nodes, guilds, battles, initials, today);
+
+  // 週次ボードの「保有ギルド」は、その週が始まった時点のスナップショット。
+  // 週の途中で結果が出ても書き換わらず、勝ったギルドは翌週の保有ギルドになる。
+  const boardLedger = new Ledger(
+    nodes, guilds,
+    battles.filter((b) => b.battle_date < monday),
+    initials, monday,
+  );
 
   const activeIds = new Set(guilds.filter((g) => g.active).map((g) => g.id));
   const weekBattles = battles.filter(
     (b) => b.battle_date >= monday && b.battle_date <= addDays(monday, 6));
-  const week = buildWeek(monday, ledger, nodes, weekBattles, parts, activeIds);
+  const week = buildWeek(monday, boardLedger, nodes, weekBattles, parts, activeIds, today);
 
   return html(renderPage({
     week, ledger, nodes, guilds,

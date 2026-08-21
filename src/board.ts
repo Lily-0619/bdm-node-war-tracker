@@ -1,7 +1,8 @@
 /** 週次ボードの組み立て。開催のない曜日はそもそも行を作らない。 */
 import {
   BattleRow, GuildRow, InitialRow, Ledger, NodeRow, TIER_LABEL, WEEKDAY_JA,
-  WEEKDAY_ORDER, addDays, heatClass, tierRank, weekStart,
+  WEEKDAY_OFFSET, WEEKDAY_ORDER, addDays, clamp0, daysBetween, heatClass,
+  tierRank, weekStart,
 } from "./calc";
 
 export interface BoardRow {
@@ -14,6 +15,8 @@ export interface BoardRow {
   eligible: number[];
   vacancyDays: number | null; heat: string;
   holder: string; holdingDays: number | null; isVacant: boolean;
+  /** 前週の対戦がまだ行われていないため、保有ギルドが決まっていない */
+  isUndetermined: boolean;
 }
 
 export interface BoardDay {
@@ -38,6 +41,8 @@ export function buildWeek(
   battles: BattleRow[],
   participants: { battle_id: number; guild_id: number; position: number; name: string }[],
   activeGuildIds: Set<number>,
+  /** 実際の今日。前週の対戦がまだ行われていない拠点を「未定」にするために使う */
+  realToday?: string,
 ): Week {
   const dates = weekDates(monday);
 
@@ -83,7 +88,18 @@ export function buildWeek(
       const st = ledger.state(node.id);
       const occ = b ? ledger.battleResult.get(b.id) : undefined;
       if (b && b.winner_guild_id) done++;
-      const vacancy = occ ? occ.vacancyDays : st.vacancyDaysNow;
+      // 保有日数・税は「この日の対戦時点」で測る。週の中で結果が出ても動かない。
+      //   空席なら 税 = 空席になった日 → この日の対戦（勝てば手に入る空席日数）
+      //   保有中なら 税 = そのギルドが取ったときの空席日数（実績値のまま）
+      const vacancy = st.holderGuildId === null
+        ? clamp0(daysBetween(d, st.vacantSince))
+        : st.vacancyDaysNow;
+      const holdDays = st.holderGuildId === null
+        ? null
+        : clamp0(daysBetween(d, st.heldSince));
+      // 保有ギルドは「前週の対戦で勝ったギルド」。その対戦がまだ行われていなければ未定。
+      const prevScheduled = addDays(monday, (WEEKDAY_OFFSET[node.weekday] ?? 0) - 7);
+      const undetermined = !!realToday && prevScheduled > realToday;
       rows.push({
         nodeId: node.id, name: node.name, tier: node.tier,
         tierLabel: TIER_LABEL[node.tier] ?? node.tier,
@@ -96,16 +112,19 @@ export function buildWeek(
         winnerGuildId: b ? b.winner_guild_id : null,
         participants: b ? (partsByBattle.get(b.id) ?? []) : [],
         eligible: ledger.eligibleGuildIds(node.id, activeGuildIds),
-        vacancyDays: vacancy, heat: heatClass(vacancy),
-        holder: st.holderName, holdingDays: st.holdingDays,
-        isVacant: st.holderGuildId === null,
+        vacancyDays: undetermined ? null : vacancy,
+        heat: heatClass(undetermined ? null : vacancy),
+        holder: undetermined ? "" : st.holderName,
+        holdingDays: undetermined ? null : holdDays,
+        isVacant: !undetermined && st.holderGuildId === null,
+        isUndetermined: undetermined,
       });
     }
 
     days.push({
       weekday: wk, weekdayJa: WEEKDAY_JA[wk], date: d,
       dateShort: d.slice(5), isCastleDay: wk === "sat",
-      isToday: d === ledger.today, count: rows.length, done, rows,
+      isToday: d === (realToday ?? ledger.today), count: rows.length, done, rows,
     });
   }
 

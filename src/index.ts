@@ -98,32 +98,29 @@ router.get("/", async (c) => {
   // 右側の税収ランキング・保有サマリは「いまの最新状態」で見せる
   const ledger = new Ledger(nodes, guilds, battles, initials, today);
 
-  // 週次ボードの「保有ギルド」は、その週が始まった時点のスナップショット。
-  // 週の途中で結果が出ても書き換わらず、勝ったギルドは翌週の保有ギルドになる。
-  const boardLedger = new Ledger(
-    nodes, guilds,
-    battles.filter((b) => b.battle_date < monday),
-    initials, monday,
-  );
-
   const activeIds = new Set(guilds.filter((g) => g.active).map((g) => g.id));
   const weekBattles = battles.filter(
     (b) => b.battle_date >= monday && b.battle_date <= addDays(monday, 6));
 
-  // 入札権はその日の朝時点の保有状況で決まる。週の途中で拠点を手放したギルドは
-  // その後の曜日では無所属として扱う（例: 金曜に負けて手放し、日曜の1等級に入札できる）。
+  // 週次ボードの各行は「その日の朝の時点」で組み立てる。
+  // その日より前の対戦結果だけを反映するので、
+  //   ・その拠点自身のその日の結果を入れても、その行は書き換わらない
+  //     （勝ったギルドは次にその拠点が開催される週の行に出る）
+  //   ・月曜に他の拠点で勝って移動したギルドは、木曜の行ではもう保有していない
+  //     （手放した拠点は木曜の時点で空席になる）
+  //   ・入札権も同じ基準。拠点を失ったギルドはその後の曜日で1等級にも入札できる
   // 同じ日の対戦どうしは結果が出る前に入札するので、その日の分は含めない。
-  const bidLedgers = new Map<string, Ledger>();
+  const dayLedgers = new Map<string, Ledger>();
   for (let i = 0; i < 7; i++) {
     const d = addDays(monday, i);
-    bidLedgers.set(
+    dayLedgers.set(
       d,
       new Ledger(nodes, guilds, battles.filter((b) => b.battle_date < d), initials, d),
     );
   }
 
   const week = buildWeek(
-    monday, boardLedger, nodes, weekBattles, parts, activeIds, today, bidLedgers);
+    monday, ledger, nodes, weekBattles, parts, activeIds, today, dayLedgers);
 
   return html(renderPage({
     week, ledger, nodes, guilds,

@@ -274,14 +274,24 @@ export class Ledger {
     };
   }
 
-  /**
-   * 指定した日の時点でその拠点を保有していたギルド。
-   * 週次ボードの「保有ギルド」（その週が始まった時点の保有者）を後から引くのに使う。
-   */
+  /** 指定した日の時点でその拠点を保有していたギルド。 */
   holderAt(nodeId: number, iso: string): Occupation | null {
     const occs = this.states.get(nodeId)?.occupations ?? [];
     for (const o of occs) {
       if (o.acquired <= iso && (o.released === null || o.released > iso)) return o;
+    }
+    return null;
+  }
+
+  /**
+   * 指定した日の「朝の時点」でその拠点を保有していたギルド。
+   * 獲得も放棄も対戦の時間に起きるので、その日の対戦の前の状態を返す。
+   * 週次ボードの「保有ギルド」欄と同じ基準。
+   */
+  holderAtMorning(nodeId: number, iso: string): Occupation | null {
+    const occs = this.states.get(nodeId)?.occupations ?? [];
+    for (const o of occs) {
+      if (o.acquired < iso && (o.released === null || o.released >= iso)) return o;
     }
     return null;
   }

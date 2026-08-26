@@ -78,8 +78,8 @@ export function fullWorkbook(inp: ExportInput): Uint8Array {
     const wd = weekdayKey(b.battle_date);
     const cellS = WEEKDAY_STYLE[wd] ?? S.CELL;
     const centerS = WEEKDAY_STYLE_CENTER[wd] ?? S.CENTER;
-    // 「保有ギルド」はその戦が属する週が始まった時点の保有者（週の途中では書き換わらない）
-    const heldAtWeekStart = ledger.holderAt(b.node_id, weekStart(b.battle_date));
+    // 「保有ギルド」はその戦の朝の時点の保有者（その戦の結果では書き換わらない）
+    const heldAtWeekStart = ledger.holderAtMorning(b.node_id, b.battle_date);
     const base: Row = [
       { v: WEEKDAY_JA[wd], s: centerS },
       { v: b.battle_date, s: cellS },

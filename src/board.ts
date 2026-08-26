@@ -44,11 +44,14 @@ export function buildWeek(
   /** 実際の今日。前週の対戦がまだ行われていない拠点を「未定」にするために使う */
   realToday?: string,
   /**
-   * 入札権を判定するための、その日の朝時点の台帳（日付 -> Ledger）。
-   * 「保有ギルド」欄は週開始時点で固定だが、入札権は違う。
-   * 週の途中で拠点を手放したギルドは、その後の曜日では無所属として扱う必要がある。
+   * その日の朝時点の台帳（日付 -> Ledger）。その日より前の対戦結果だけを反映する。
+   * 保有ギルド・保有日数・税・入札権はすべてこれを基準にする。
+   *
+   * その拠点自身のその日の対戦結果は入らないので、結果を入れても行は書き換わらない。
+   * 一方、月曜に他の拠点で勝って移動したギルドは、木曜の行ではもう保有していない
+   * ことになる（＝手放した拠点は木曜の時点で空席として出る）。
    */
-  bidLedgers?: Map<string, Ledger>,
+  dayLedgers?: Map<string, Ledger>,
 ): Week {
   const dates = weekDates(monday);
 
@@ -89,12 +92,15 @@ export function buildWeek(
     const rows: BoardRow[] = [];
     let done = 0;
 
+    // その日の朝の時点の台帳。その日より前の対戦結果だけを反映している。
+    const dayLedger = dayLedgers?.get(d) ?? ledger;
+
     for (const node of nodeRows) {
       const b = battleByKey.get(`${d}_${node.id}`);
-      const st = ledger.state(node.id);
-      const occ = b ? ledger.battleResult.get(b.id) : undefined;
+      const st = dayLedger.state(node.id);
+      const occ = b ? dayLedger.battleResult.get(b.id) : undefined;
       if (b && b.winner_guild_id) done++;
-      // 保有日数・税は「この日の対戦時点」で測る。週の中で結果が出ても動かない。
+      // 保有日数・税は「この日の対戦時点」で測る。
       //   空席なら 税 = 空席になった日 → この日の対戦（勝てば手に入る空席日数）
       //   保有中なら 税 = そのギルドが取ったときの空席日数（実績値のまま）
       const vacancy = st.holderGuildId === null
@@ -117,7 +123,7 @@ export function buildWeek(
         banquet: b ? !!b.banquet : false,
         winnerGuildId: b ? b.winner_guild_id : null,
         participants: b ? (partsByBattle.get(b.id) ?? []) : [],
-        eligible: (bidLedgers?.get(d) ?? ledger).eligibleGuildIds(node.id, activeGuildIds),
+        eligible: dayLedger.eligibleGuildIds(node.id, activeGuildIds),
         vacancyDays: undetermined ? null : vacancy,
         heat: heatClass(undetermined ? null : vacancy),
         holder: undetermined ? "" : st.holderName,

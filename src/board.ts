@@ -100,12 +100,11 @@ export function buildWeek(
       const st = dayLedger.state(node.id);
       const occ = b ? dayLedger.battleResult.get(b.id) : undefined;
       if (b && b.winner_guild_id) done++;
-      // 保有日数・税は「この日の対戦時点」で測る。
-      //   空席なら 税 = 空席になった日 → この日の対戦（勝てば手に入る空席日数）
-      //   保有中なら 税 = そのギルドが取ったときの空席日数（実績値のまま）
+      // 税は空席日数なので、誰かが保有している間は積み上がらない（0）。
+      // 空席なら 空席になった日 → この日の対戦 までの日数（勝てば手に入る）。
       const vacancy = st.holderGuildId === null
         ? clamp0(daysBetween(d, st.vacantSince))
-        : st.vacancyDaysNow;
+        : 0;
       const holdDays = st.holderGuildId === null
         ? null
         : clamp0(daysBetween(d, st.heldSince));

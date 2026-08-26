@@ -119,7 +119,10 @@ export interface NodeState {
   heldSince: string | null;
   holdingDays: number | null;
   vacantSince: string | null;
-  vacancyDaysNow: number | null;   // いま勝ったら得られる空席日数
+  /** いま勝ったら得られる空席日数。保有されている間は空席ではないので 0。 */
+  vacancyDaysNow: number | null;
+  /** 参考: いまの保有ギルドがこの拠点を取ったときに得た空席日数 */
+  earnedVacancyDays?: number | null;
   occupations: Occupation[];
 }
 
@@ -258,7 +261,10 @@ export class Ledger {
       state.holderName = last.guildName;
       state.heldSince = last.acquired;
       state.holdingDays = last.holdingDays;
-      state.vacancyDaysNow = last.vacancyDays;
+      // 誰かが保有している間は空席ではないので、税は積み上がらない。
+      // このギルドが取ったときに得た空席日数は last.vacancyDays に残っている（履歴用）。
+      state.earnedVacancyDays = last.vacancyDays;
+      state.vacancyDaysNow = 0;
     } else {
       const vacantSince = seq.length ? seq[seq.length - 1].released : prevReleaseSeed;
       state.vacantSince = vacantSince;

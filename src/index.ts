@@ -109,7 +109,21 @@ router.get("/", async (c) => {
   const activeIds = new Set(guilds.filter((g) => g.active).map((g) => g.id));
   const weekBattles = battles.filter(
     (b) => b.battle_date >= monday && b.battle_date <= addDays(monday, 6));
-  const week = buildWeek(monday, boardLedger, nodes, weekBattles, parts, activeIds, today);
+
+  // 入札権はその日の朝時点の保有状況で決まる。週の途中で拠点を手放したギルドは
+  // その後の曜日では無所属として扱う（例: 金曜に負けて手放し、日曜の1等級に入札できる）。
+  // 同じ日の対戦どうしは結果が出る前に入札するので、その日の分は含めない。
+  const bidLedgers = new Map<string, Ledger>();
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(monday, i);
+    bidLedgers.set(
+      d,
+      new Ledger(nodes, guilds, battles.filter((b) => b.battle_date < d), initials, d),
+    );
+  }
+
+  const week = buildWeek(
+    monday, boardLedger, nodes, weekBattles, parts, activeIds, today, bidLedgers);
 
   return html(renderPage({
     week, ledger, nodes, guilds,

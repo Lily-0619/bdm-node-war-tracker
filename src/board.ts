@@ -43,6 +43,12 @@ export function buildWeek(
   activeGuildIds: Set<number>,
   /** 実際の今日。前週の対戦がまだ行われていない拠点を「未定」にするために使う */
   realToday?: string,
+  /**
+   * 入札権を判定するための、その日の朝時点の台帳（日付 -> Ledger）。
+   * 「保有ギルド」欄は週開始時点で固定だが、入札権は違う。
+   * 週の途中で拠点を手放したギルドは、その後の曜日では無所属として扱う必要がある。
+   */
+  bidLedgers?: Map<string, Ledger>,
 ): Week {
   const dates = weekDates(monday);
 
@@ -111,7 +117,7 @@ export function buildWeek(
         banquet: b ? !!b.banquet : false,
         winnerGuildId: b ? b.winner_guild_id : null,
         participants: b ? (partsByBattle.get(b.id) ?? []) : [],
-        eligible: ledger.eligibleGuildIds(node.id, activeGuildIds),
+        eligible: (bidLedgers?.get(d) ?? ledger).eligibleGuildIds(node.id, activeGuildIds),
         vacancyDays: undetermined ? null : vacancy,
         heat: heatClass(undetermined ? null : vacancy),
         holder: undetermined ? "" : st.holderName,

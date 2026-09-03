@@ -1,3 +1,4 @@
+2026-08-27　W 黒の太陽　L Unity, xAEGISx, ーリベリオンー
 2026-08-20　W 黒の太陽　L Unity, シェイド, 黄昏のえりしおん
 2026-08-13　W xAEGISx　L 黄昏のえりしおん, 黒の太陽, Unity
 2026-08-06　W Unity　L FLORISTS, 黄昏のえりしおん, 黒の太陽

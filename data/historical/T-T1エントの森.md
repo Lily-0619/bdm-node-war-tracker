@@ -1,3 +1,5 @@
+2026-09-03　W cobraXverse　L 
+2026-08-27　W cobraXverse　L 一SUN一, 微笑Paty
 2026-08-20　W 一SUN一　L Orzeca
 2026-08-13　W 一SUN一　L Orzeca, DarkChaos
 2026-08-06　W 一SUN一　L Orzeca

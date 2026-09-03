@@ -1,3 +1,4 @@
+2026-08-30　W ーArch　L RL1, SERENITY
 2026-08-23　W シェイド　L 一Arch, SЕRЕNIТY
 2026-08-16　W 一Arch　L シェイド, 神聖堂
 2026-08-09　W 一Arch　L 黄昏のえりしおん, シェイド

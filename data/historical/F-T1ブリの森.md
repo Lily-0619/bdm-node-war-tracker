@@ -1,3 +1,4 @@
+2026-08-28　W 亗Luxúria亗　L Kopitiam, MelonEmpire
 2026-08-21　W 亗Luxúria亗　L MelonEmpire, Kopitiam
 2026-08-14　W 亗Luxúria亗　L Kopitiam, MelonEmpire
 2026-08-07　W 亗Luxúria亗　L MelonEmpire, Kopitiam
@@ -44,7 +45,6 @@
 2025-10-17　W 一惡人谷一　L ZirconiA, Иouver
 2025-10-10　W 一惡人谷一　L ZirconiA, Anino
 2025-10-03　W ZirconiA　L SkyCastIe, MelonEmpire
-2025-09-26　W Draw　L No Bidder
 2025-09-26　W SkyCastIe　L Kopitiam, Оnyх
 2025-09-19　W Kopitiam　L 雲淡風輕o, Оnyх
 2025-09-12　W Kopitiam　L ーEspoirー, DarkChaos

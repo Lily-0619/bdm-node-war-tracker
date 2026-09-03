@@ -1,3 +1,4 @@
+2026-08-27　W Kopitiam　L MelonEmpire, 亗Luxúria亗
 2026-08-20　W Kopitiam　L 亗Luxúria亗, MelonEmpire
 2026-08-13　W Kopitiam　L 亗Luxúria亗, ZirconiA
 2026-08-06　W Kopitiam　L MelonEmpire, 亗Luxúria亗
@@ -20,7 +21,6 @@
 2026-04-09　W Kopitiam　L ßบรнíïdо丶ๅ家族, 亗Luxúria亗
 2026-04-02　W Kopitiam　L ßบรнíïdо丶ๅ家族, 亗Luxúria亗
 2026-03-26　W Kopitiam　L C0BRA, ßบรнíïdо丶ๅ家族
-2026-03-19　W C0BRA　L Иouver, Outlawss, Sangsaka, 厶pocalypse
 2026-03-19　W Draw　L Иouver, Outlawss, C0BRA
 2026-03-12　W Иouver　L C0BRA, 厶pocalypse
 2026-03-05　W C0BRA　L 厶pocalypse, Иouver

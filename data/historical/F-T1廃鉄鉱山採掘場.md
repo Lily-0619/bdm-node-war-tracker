@@ -1,3 +1,4 @@
+2026-08-28　W REGENCY彡　L 
 2026-08-21　W REGENCY彡　L SЕRЕNIТY, 柿一門
 2026-08-14　W Restart　L No Bidder
 2026-08-07　W Restart　L 厶pocalypse, obIivion

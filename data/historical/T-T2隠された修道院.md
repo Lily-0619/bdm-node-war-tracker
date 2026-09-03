@@ -1,3 +1,4 @@
+2026-08-27　W 天機　L Restart, ーEspoirー, 柿一門, 氣噗噗讓玻璃心碎一地
 2026-08-20　W Restart　L FLORISTS, Pandora, Maverickz, 義勇
 2026-08-13　W FLORISTS　L cobraXverse, 義勇, 柿一門, Restart
 2026-08-06　W RaиkSS　L 義勇, ZirconiA, 微笑Party, 美孚冰室
@@ -49,7 +50,6 @@
 2025-09-18　W 桜吹雪　L ーEspoirー, SkyCastIe, UprisE, Relaх
 2025-09-11　W ・殺戮・　L 義勇, Pandora, 雲淡風輕o, PinoyPioneer
 2025-09-04　W 雪狼族　L 桜吹雪, 東京熱株式會社, 殺戮THM, ーEspoirー
-2025-08-28　W 桜吹雪　L No Bidder
 2025-08-28　W Draw　L 亗Luxúria亗, Phoenix, 桜吹雪, UprisE, 義勇
 2025-08-21　W PONYTAIL　L UprisE, 東京熱株式會社, 毛家村, 雪狼族
 2025-08-14　W MelonEmpire　L T乇卂卩卂尺TY

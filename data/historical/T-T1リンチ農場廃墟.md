@@ -1,3 +1,4 @@
+2026-08-27　W 一惡人谷一　L SERENITY
 2026-08-20　W 一惡人谷一　L No Bidder
 2026-08-13　W 一惡人谷一　L No Bidder
 2026-08-06　W 一惡人谷一　L xAEGISx

@@ -1,3 +1,4 @@
+2026-08-30　W ーリベリオンー　L CRUSHSA
 2026-08-23　W ーリベリオンー　L EIemento, Etërnîty
 2026-08-16　W EIemento　L ーリベリオンー, ZirconiA
 2026-08-09　W ーリベリオンー　L No Bidder

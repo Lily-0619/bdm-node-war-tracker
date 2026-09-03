@@ -1,3 +1,4 @@
+2026-08-30　W TRAITORs　L DEMIIGODS혼혈
 2026-08-23　W VainqueurJP　L Orzeca, 一SUN一
 2026-08-16　W VainqueurJP　L 海洋之心, SЕRЕNIТY
 2026-08-09　W 海洋之心　L No Bidder

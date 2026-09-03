@@ -1,3 +1,5 @@
+2026-08-31　W PokemonGO　L 一SUN一, 當惡魔遇到殺手貓
+2026-08-24　W PokemonGO　L 當惡魔遇到殺手貓, 雲淡風輕o
 2026-08-17　W 當惡魔遇到殺手貓　L No Bidder
 2026-08-10　W TRAITORs　L 當惡魔遇到殺手貓, RaиkSS, 雲淡風輕o
 2026-08-03　W TRAITORs　L 當惡魔遇到殺手貓, VainqueurJP, Oops

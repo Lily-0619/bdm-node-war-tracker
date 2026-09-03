@@ -1,3 +1,4 @@
+2026-08-28　W ZirconiA　L Pandora, Restart, 柿一門, 義勇
 2026-08-21　W ZirconiA　L ーEspoirー, rabbits, ひよこりあ, 義勇
 2026-08-14　W ZirconiA　L オアシステップ, 柿一門, 義勇, ーEspoirー
 2026-08-07　W オアシステップ　L のら猫, 柿一門, xAEGISx, ーEspoirー

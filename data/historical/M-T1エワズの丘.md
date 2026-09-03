@@ -1,3 +1,4 @@
+2026-08-31　W ーリベリオンー　L SERENITY, 放置無言出入自由
 2026-08-24　W 放置無言出入自由　L No Bidder
 2026-08-17　W Orzeca　L 一SUN一
 2026-08-10　W Orzeca　L 一SUN一

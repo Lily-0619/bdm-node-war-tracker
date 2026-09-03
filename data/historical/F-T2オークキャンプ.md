@@ -1,3 +1,4 @@
+2026-08-28　W VainqueurJP　L Orzeca, 一SUN一
 2026-08-21　W Orzeca　L xAEGISx, 一SUN一
 2026-08-14　W xAEGISx　L 美孚冰室, 微笑Party
 2026-08-07　W 美孚冰室　L 微笑Party

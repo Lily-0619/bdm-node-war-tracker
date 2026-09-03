@@ -1,3 +1,4 @@
+2026-08-28　W 微笑Party　L cobraXverse
 2026-08-21　W PokemonGo　L Pandora
 2026-08-14　W Döraè่mön　L 一Arch, cobraXverse
 2026-08-07　W 一Arch　L No Bidder

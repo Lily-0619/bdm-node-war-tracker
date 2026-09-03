@@ -28,14 +28,19 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: python3 scripts/sync_historical_from_d1.py --query-and-run
 
+      - name: Rebuild report/output workbook
+        run: |
+          pip install openpyxl
+          python3 report/scripts/build_report.py
+
       - name: Commit and push if changed
         run: |
-          if git diff --quiet -- data/historical; then
+          if git diff --quiet -- data/historical report/output; then
             echo "変更なし"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/historical
-          git commit -m "chore: D1の対戦結果をhistoricalへ自動反映"
+          git add data/historical report/output
+          git commit -m "chore: D1の対戦結果をhistorical/reportへ自動反映"
           git push

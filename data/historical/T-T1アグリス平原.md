@@ -1,3 +1,4 @@
+2026-09-03　W 厶pocalypse　L Elemento, SanctaTerra
 2026-08-27　W EIemento　L 厶pocalypse, Revenant, SanctaTerra, Sangsaka
 2026-08-20　W 厶pocalypse　L REGENCY彡, EIemento, SЕRЕNIТY, 柿一門
 2026-08-13　W REGENCY彡　L EIemento, ーEspoirー, SanctaTerra, 厶pocalypse

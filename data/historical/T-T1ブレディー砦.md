@@ -1,3 +1,4 @@
+2026-09-03　W Kopitiam　L VIRULENT死, 亗Luxúria亗
 2026-08-27　W Kopitiam　L MelonEmpire, 亗Luxúria亗
 2026-08-20　W Kopitiam　L 亗Luxúria亗, MelonEmpire
 2026-08-13　W Kopitiam　L 亗Luxúria亗, ZirconiA

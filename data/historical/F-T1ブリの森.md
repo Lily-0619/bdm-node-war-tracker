@@ -1,3 +1,4 @@
+2026-09-04　W ーリベリオンー　L 柿一門
 2026-08-28　W 亗Luxúria亗　L Kopitiam, MelonEmpire
 2026-08-21　W 亗Luxúria亗　L MelonEmpire, Kopitiam
 2026-08-14　W 亗Luxúria亗　L Kopitiam, MelonEmpire

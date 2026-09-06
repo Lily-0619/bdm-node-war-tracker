@@ -1,3 +1,4 @@
+2026-09-06　W xAEGISx　L 
 2026-08-30　W 一SUN一　L Orzeca
 2026-08-23　W Döraè่mön　L cobraXverse
 2026-08-16　W cobraXverse　L 微笑Party

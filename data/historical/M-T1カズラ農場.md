@@ -1,3 +1,4 @@
+2026-09-07　W 亗Luxúria亗　L KOMADRONA, MelonEmpire, Restart, 柿一門
 2026-08-31　W 亗Luxúria亗　L Outlawss, ZirconiA, 厶pocalypse, 柿一門
 2026-08-24　W 柿一門　L EIemento, SanctaTerra
 2026-08-17　W 亗Luxúria亗　L EIemento, 柿一門, SanctaTerra

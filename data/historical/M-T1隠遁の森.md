@@ -1,3 +1,4 @@
+2026-09-07　W Pandora　L Maverickz, Revenant, RëBîrth, ーEspoirー
 2026-08-31　W Maverickz　L Pandora, 黄昏のえりしおん
 2026-08-24　W Maverickz　L MÏRÃGË, Revenant, RëBîrth, 鎮山河
 2026-08-17　W Döraè่mön　L Restart, Pandora, ZirconiA, ーEspoirー

@@ -36,6 +36,27 @@ def click_text(page: Page, label: str) -> None:
                     return
             except Exception:
                 pass
+    # Material-style menus often expose icon text together with the label
+    # (for example "settings Setting"). Pick the smallest visible partial match.
+    broad = page.locator("a,button,li,[role='button'],[role='link'],[role='menuitem'],span,div,p")
+    matches = []
+    for i in range(min(broad.count(), 500)):
+        try:
+            item = broad.nth(i)
+            text = re.sub(r"\\s+", " ", item.inner_text()).strip()
+            if item.is_visible() and label.lower() in text.lower() and len(text) <= 60:
+                box = item.bounding_box()
+                if box:
+                    matches.append((box["width"] * box["height"], item))
+        except Exception:
+            continue
+    if matches:
+        item = min(matches, key=lambda pair: pair[0])[1]
+        item.scroll_into_view_if_needed()
+        item.click(timeout=5000)
+        page.wait_for_timeout(1200)
+        return
+
     # Sidebar entries can be outside a nested scroll area even though they exist in
     # the DOM. Click their nearest interactive ancestor directly in that case.
     clicked = page.evaluate("""label => {

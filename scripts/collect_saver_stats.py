@@ -14,6 +14,13 @@ from playwright.sync_api import Page, sync_playwright
 
 LOGIN_URL = "https://dbonk.com/bdmbsmv2/index.php"
 SERVERS = ("ASIA", "EUROPE", "AMERICA")
+CLASS_ALIASES = {"Askeia": "Mystic", "Zayed": "Hashashin", "Sura": "Ninja"}
+CLASS_ORDER = (
+    "Warrior", "Ranger", "Witch", "Giant", "Valkyrie", "Sorceress", "Musa", "Tamer",
+    "Ninja", "Dark Knight", "Striker", "Maehwa", "Lahn", "Mystic", "Wizard", "Shai",
+    "Kunoichi", "Archer", "Hashashin", "Nova", "Guardian", "Corsair", "Sage", "Drakania",
+    "Maegu", "Woosa", "Scholar", "Dosa", "Deadeye", "Seraph",
+)
 
 
 def env(name: str) -> str:
@@ -271,8 +278,16 @@ def extract_classes(page: Page) -> list[dict[str, Any]]:
     merged: dict[str, int] = {}
     for name, value in raw:
         name = str(name).strip(); digits = re.sub(r"\D", "", str(value))
-        if name and digits and not ignored.search(name): merged[name] = int(digits)
-    result = [{"class_name": name, "player_count": count, "sort_order": i} for i, (name, count) in enumerate(merged.items())]
+        if name and digits and not ignored.search(name):
+            canonical = CLASS_ALIASES.get(name, name)
+            merged[canonical] = merged.get(canonical, 0) + int(digits)
+    unknown = sorted(set(merged) - set(CLASS_ORDER))
+    if unknown:
+        raise RuntimeError(f"unknown classes: {', '.join(unknown)}")
+    # DBank can omit a zero-count class from the chart. Persist the complete,
+    # fixed 30-class order so every snapshot renders with the same rows.
+    result = [{"class_name": name, "player_count": merged.get(name, 0), "sort_order": i}
+              for i, name in enumerate(CLASS_ORDER)]
     if not result or not 900 <= sum(x["player_count"] for x in result) <= 1100:
         if os.getenv("SAVERSTATS_DEBUG", "0") == "1":
             print("CHART_DIAGNOSTIC:", json.dumps(chart_diagnostics(page), ensure_ascii=False))

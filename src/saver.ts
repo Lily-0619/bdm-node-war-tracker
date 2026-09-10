@@ -3,6 +3,11 @@ import { buildXlsx, S, Sheet } from "./xlsx";
 
 export const SAVER_SERVERS = ["ASIA", "EUROPE", "AMERICA"] as const;
 export type SaverServer = typeof SAVER_SERVERS[number];
+const SAVER_CLASS_ALIASES: Record<string, string> = { Askeia: "Mystic", Zayed: "Hashashin", Sura: "Ninja" };
+const SAVER_CLASS_ORDER = ["Warrior", "Ranger", "Witch", "Giant", "Valkyrie", "Sorceress", "Musa", "Tamer",
+  "Ninja", "Dark Knight", "Striker", "Maehwa", "Lahn", "Mystic", "Wizard", "Shai", "Kunoichi", "Archer",
+  "Hashashin", "Nova", "Guardian", "Corsair", "Sage", "Drakania", "Maegu", "Woosa", "Scholar", "Dosa",
+  "Deadeye", "Seraph"];
 
 export interface SaverSnapshotInput {
   server: SaverServer;
@@ -108,12 +113,21 @@ export function saverWorkbook(data: Awaited<ReturnType<typeof loadSaverStats>>):
     ...data.snapshots.map((r) => [r.captured_date, r.server, r.total_players, r.active_players,
       r.total_guilds, r.active_guilds, r.captured_at]),
   ];
-  const byId = new Map(data.snapshots.map((s) => [s.id, s]));
+  const sourceById = new Map<number, SaverClassRow[]>();
+  data.classes.forEach((row) => {
+    if (!sourceById.has(row.snapshot_id)) sourceById.set(row.snapshot_id, []);
+    sourceById.get(row.snapshot_id)!.push(row);
+  });
   const classRows: Sheet["rows"] = [
     ["取得日", "サーバー", "職", "Top1000人数", "表示順"].map((v) => ({ v, s: S.HEADER })),
-    ...data.classes.map((r) => {
-      const snap = byId.get(r.snapshot_id)!;
-      return [snap.captured_date, snap.server, r.class_name, r.player_count, r.sort_order + 1];
+    ...data.snapshots.flatMap((snapshot) => {
+      const merged = new Map<string, number>();
+      for (const row of sourceById.get(snapshot.id) ?? []) {
+        const name = SAVER_CLASS_ALIASES[row.class_name] ?? row.class_name;
+        merged.set(name, (merged.get(name) ?? 0) + row.player_count);
+      }
+      return SAVER_CLASS_ORDER.filter((name) => merged.has(name)).map((name, index) =>
+        [snapshot.captured_date, snapshot.server, name, merged.get(name)!, index + 1]);
     }),
   ];
   return buildXlsx([
@@ -129,9 +143,9 @@ export function renderSaverStatsPage(): string {
 <main class="stats-wrap"><header class="stats-header"><div><h1>SaverStats 推移</h1><p>Asia・Europe・America の日次取得データ</p></div><a class="btn excel" href="/saver-stats/export.xlsx">Excelでダウンロード</a></header>
 <section class="stats-controls"><label>開始日 <input id="stats-from" type="date"></label><label>終了日 <input id="stats-to" type="date"></label><label>サーバー <select id="stats-server"><option value="ASIA">Asia</option><option value="EUROPE">Europe</option><option value="AMERICA">America</option></select></label><button class="btn primary" id="stats-apply">表示</button></section>
 <div id="stats-error" class="stats-error" hidden></div><section id="stats-latest" class="stats-kpis"></section>
-<section class="stats-card"><div class="stats-card-head"><h2>プレイヤー・ギルド推移</h2><div id="metric-legend" class="chart-legend"></div></div><div id="metric-chart" class="svg-chart"></div></section>
-<section class="stats-card"><div class="stats-card-head"><h2>Main Class Popularity (Top 1000)</h2><div id="class-legend" class="chart-legend class-legend"></div></div><div id="class-chart" class="svg-chart tall"></div></section>
-<p class="stats-note">日付範囲を指定して比較できます。職グラフの凡例をクリックすると表示／非表示を切り替えられます。</p></main>
+<section class="stats-card"><div class="stats-card-head"><h2>職 Top1000 推移</h2><p class="stats-note">各職とも新しい日付が上です。棒の右端を結ぶ線で人数の変化を確認できます。</p></div><div id="class-chart" class="class-chart-grid"></div></section>
+<section class="stats-card"><div class="stats-card-head"><h2>サーバー状況の推移</h2></div><div id="metric-chart" class="metric-chart-grid"></div></section>
+</main>
 <script src="/saver-stats.js"></script></body></html>`;
 }
 

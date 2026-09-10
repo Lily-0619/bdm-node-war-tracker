@@ -156,6 +156,11 @@ def extract_classes(page: Page) -> list[dict[str, Any]]:
       document.querySelectorAll('svg text,.apexcharts-legend-text,.highcharts-legend-item text').forEach(x => {
         const text = clean(x.textContent); const m = text.match(/^(.+?)\\s*[:–-]?\\s*(\\d[\\d,]*)$/); if (m) out.push([m[1],m[2]]);
       });
+      document.querySelectorAll('svg [aria-label],svg [title],svg title').forEach(x => {
+        const text = clean(x.getAttribute('aria-label') || x.getAttribute('title') || x.textContent);
+        const m = text.match(/^(.+?)[,:]\\s*(\\d[\\d,]*)(?:\\D|$)/);
+        if (m) out.push([m[1],m[2]]);
+      });
       const charts = [];
       if (window.Apex && Array.isArray(window.Apex._chartInstances)) window.Apex._chartInstances.forEach(x => charts.push({labels:x.chart?.w?.globals?.labels,series:x.chart?.w?.globals?.series}));
       if (window.Highcharts && Array.isArray(window.Highcharts.charts)) window.Highcharts.charts.filter(Boolean).forEach(c => charts.push({labels:c.xAxis?.[0]?.categories,series:c.series?.[0]?.yData}));

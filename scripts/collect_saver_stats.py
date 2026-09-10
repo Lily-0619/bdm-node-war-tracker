@@ -157,6 +157,16 @@ def main() -> None:
         page = browser.new_page(viewport={"width": 1440, "height": 1000})
         try:
             login(page)
+            # Some DBank sessions replace the login page and open the dashboard
+            # in another tab. Continue with the newest non-empty page.
+            for candidate in reversed(page.context.pages):
+                try:
+                    if candidate.locator("body").inner_text().strip():
+                        page = candidate
+                        break
+                except Exception:
+                    continue
+            page.wait_for_timeout(1000)
             payload = [collect(page, server) for server in SERVERS]
         except Exception:
             location = urlsplit(page.url)
@@ -169,6 +179,9 @@ def main() -> None:
                 "known_labels": checks,
                 "links": page.locator("a").count(),
                 "buttons": page.locator("button").count(),
+                "pages": len(page.context.pages),
+                "frames": len(page.frames),
+                "html_length": len(page.content()),
             }))
             raise
         finally:

@@ -1,0 +1,139 @@
+"""Collect BDMBSM Server Stats for all regions and send one daily payload."""
+from __future__ import annotations
+
+import json
+import os
+import re
+import urllib.request
+from datetime import datetime, timedelta, timezone
+from typing import Any
+
+from dotenv import load_dotenv
+from playwright.sync_api import Page, sync_playwright
+
+LOGIN_URL = "https://dbonk.com/bdmbsmv2/index.php"
+SERVERS = ("ASIA", "EUROPE", "AMERICA")
+
+
+def env(name: str) -> str:
+    value = os.getenv(name, "").strip()
+    if not value:
+        raise RuntimeError(f"{name} is required")
+    return value
+
+
+def click_text(page: Page, label: str) -> None:
+    rx = re.compile(rf"^\s*{re.escape(label)}\s*$", re.I)
+    for locator in (page.get_by_text(rx), page.get_by_role("button", name=rx), page.get_by_role("link", name=rx)):
+        if locator.count() and locator.first.is_visible():
+            locator.first.click(timeout=5000)
+            page.wait_for_timeout(1200)
+            return
+    raise RuntimeError(f"menu item not found: {label}")
+
+
+def login(page: Page) -> None:
+    page.goto(LOGIN_URL, wait_until="domcontentloaded")
+    user = page.locator("input[placeholder='Input Username']")
+    password = page.locator("input[placeholder='Input Password'],input[type='password']")
+    if user.count() and password.count():
+        user.first.fill(env("DBONK_USERNAME")); password.first.fill(env("DBONK_PASSWORD"))
+        button = page.get_by_role("button", name=re.compile(r"^\s*Login\s*$", re.I))
+        button.first.click() if button.count() else password.first.press("Enter")
+        page.wait_for_timeout(1800)
+    if page.get_by_text(re.compile(r"^\s*Asia\s*$", re.I)).count():
+        click_text(page, "Asia")
+
+
+def open_menu(page: Page, name: str) -> None:
+    for candidate in (page.locator("button:has-text('menu')"), page.locator("[aria-label*='menu' i]")):
+        if candidate.count() and candidate.first.is_visible():
+            candidate.first.click(timeout=3000); page.wait_for_timeout(400); break
+    click_text(page, name)
+
+
+def set_server(page: Page, server: str) -> None:
+    open_menu(page, "Setting")
+    page.get_by_text(re.compile(r"View Server", re.I)).first.wait_for(timeout=10000)
+    # Prefer a native/select-like control, then fall back to visible server labels.
+    selects = page.locator("select")
+    for i in range(selects.count()):
+        options = selects.nth(i).locator("option").all_inner_texts()
+        if any(server.lower() in x.lower() for x in options):
+            option = next(x for x in options if server.lower() in x.lower())
+            selects.nth(i).select_option(label=option); page.wait_for_timeout(1500); return
+    click_text(page, "View Server")
+    aliases = {"ASIA": ("Asia",), "EUROPE": ("Europe", "European"), "AMERICA": ("America", "North America")}
+    for label in aliases[server]:
+        try:
+            click_text(page, label); return
+        except RuntimeError:
+            pass
+    raise RuntimeError(f"View Server option not found: {server}")
+
+
+def number_after(body: str, label: str) -> int:
+    match = re.search(rf"{re.escape(label)}\s*([\d,]+)", body, re.I)
+    if not match:
+        raise RuntimeError(f"stat not found: {label}")
+    return int(match.group(1).replace(",", ""))
+
+
+def extract_classes(page: Page) -> list[dict[str, Any]]:
+    raw = page.evaluate("""() => {
+      const clean = s => (s || '').replace(/\\s+/g, ' ').trim();
+      const out = [];
+      document.querySelectorAll('table tr,[role=row]').forEach(row => {
+        const cells = [...row.querySelectorAll('td,[role=cell]')].map(x => clean(x.textContent));
+        if (cells.length >= 2 && /^\\d[\\d,]*$/.test(cells[cells.length-1])) out.push([cells[cells.length-2], cells[cells.length-1]]);
+      });
+      document.querySelectorAll('svg text,.apexcharts-legend-text,.highcharts-legend-item text').forEach(x => {
+        const text = clean(x.textContent); const m = text.match(/^(.+?)\\s*[:–-]?\\s*(\\d[\\d,]*)$/); if (m) out.push([m[1],m[2]]);
+      });
+      const charts = [];
+      if (window.Apex && Array.isArray(window.Apex._chartInstances)) window.Apex._chartInstances.forEach(x => charts.push({labels:x.chart?.w?.globals?.labels,series:x.chart?.w?.globals?.series}));
+      if (window.Highcharts && Array.isArray(window.Highcharts.charts)) window.Highcharts.charts.filter(Boolean).forEach(c => charts.push({labels:c.xAxis?.[0]?.categories,series:c.series?.[0]?.yData}));
+      charts.forEach(c => (c.labels || []).forEach((label,i) => out.push([clean(String(label)), String((c.series || [])[i] ?? '')])));
+      return out;
+    }""")
+    ignored = re.compile(r"player|guild|total|active|month|rank|server|stats", re.I)
+    merged: dict[str, int] = {}
+    for name, value in raw:
+        name = str(name).strip(); digits = re.sub(r"\D", "", str(value))
+        if name and digits and not ignored.search(name): merged[name] = int(digits)
+    result = [{"class_name": name, "player_count": count, "sort_order": i} for i, (name, count) in enumerate(merged.items())]
+    if not result or not 900 <= sum(x["player_count"] for x in result) <= 1100:
+        raise RuntimeError(f"Main Class Popularity extraction failed (rows={len(result)}, sum={sum(x['player_count'] for x in result)})")
+    return result
+
+
+def collect(page: Page, server: str) -> dict[str, Any]:
+    set_server(page, server); open_menu(page, "Server Stats")
+    page.get_by_text(re.compile(r"TOTAL PLAYERS", re.I)).first.wait_for(timeout=15000)
+    body = page.locator("body").inner_text()
+    now = datetime.now(timezone(timedelta(hours=9)))
+    return {"server": server, "captured_date": now.date().isoformat(), "captured_at": now.isoformat(),
+            "total_players": number_after(body, "TOTAL PLAYERS"),
+            "active_players": number_after(body, "ACTIVE PLAYERS (1 MONTH)"),
+            "total_guilds": number_after(body, "TOTAL GUILDS"),
+            "active_guilds": number_after(body, "ACTIVE GUILDS (1 MONTH)"),
+            "classes": extract_classes(page)}
+
+
+def post(payload: list[dict[str, Any]]) -> None:
+    request = urllib.request.Request(env("STATS_INGEST_URL"), data=json.dumps(payload).encode(), method="POST",
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {env('STATS_INGEST_TOKEN')}"})
+    with urllib.request.urlopen(request, timeout=30) as response:
+        if response.status != 200: raise RuntimeError(f"ingest failed: HTTP {response.status}")
+
+
+def main() -> None:
+    load_dotenv()
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=os.getenv("HEADLESS", "1") != "0")
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        login(page); payload = [collect(page, server) for server in SERVERS]; browser.close()
+    post(payload); print(json.dumps({"ok": True, "servers": [x["server"] for x in payload]}))
+
+
+if __name__ == "__main__": main()

@@ -170,6 +170,7 @@ export function renderPage(d: PageData): string {
         ? '<a class="chip" href="/logout" style="color:#fff;text-decoration:none">編集モード（ログアウト）</a>'
         : '<a class="chip" href="/login" style="color:#fff;text-decoration:none">閲覧のみ（ログイン）</a>'
       : ""}
+  <a class="stats-entry" href="/saver-stats" title="SaverStats 推移" aria-label="SaverStats 推移">⚙</a>
 </div>
 
 <div class="toolbar">

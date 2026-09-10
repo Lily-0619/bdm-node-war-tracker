@@ -1,6 +1,7 @@
 name = "kyoten-tax-board"
 main = "src/index.ts"
-compatibility_date = "2025-07-01"
+compatibility_date = "2026-09-10"
+compatibility_flags = ["nodejs_compat"]
 
 # 静的ファイル（app.css / app.js）
 [assets]
@@ -18,4 +19,6 @@ APP_TIMEZONE_OFFSET = "9"
 
 # 編集用パスワードは secret で設定する:
 #   npx wrangler secret put EDIT_PASSWORD
+# SaverStats収集API用トークン:
+#   npx wrangler secret put STATS_INGEST_TOKEN
 # 未設定の場合は誰でも編集できる状態になる。

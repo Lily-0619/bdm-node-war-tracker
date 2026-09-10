@@ -25,10 +25,32 @@ def env(name: str) -> str:
 def click_text(page: Page, label: str) -> None:
     rx = re.compile(rf"^\s*{re.escape(label)}\s*$", re.I)
     for locator in (page.get_by_text(rx), page.get_by_role("button", name=rx), page.get_by_role("link", name=rx)):
-        if locator.count() and locator.first.is_visible():
-            locator.first.click(timeout=5000)
-            page.wait_for_timeout(1200)
-            return
+        for i in range(locator.count()):
+            item = locator.nth(i)
+            try:
+                item.scroll_into_view_if_needed(timeout=2000)
+                if item.is_visible():
+                    item.click(timeout=5000)
+                    page.wait_for_timeout(1200)
+                    return
+            except Exception:
+                pass
+    # Sidebar entries can be outside a nested scroll area even though they exist in
+    # the DOM. Click their nearest interactive ancestor directly in that case.
+    clicked = page.evaluate("""label => {
+      const wanted = label.trim().toLowerCase();
+      const nodes = [...document.querySelectorAll('a,button,[role=button],[role=link],li,div,span')];
+      const exact = nodes.filter(el => (el.textContent || '').trim().toLowerCase() === wanted);
+      const el = exact.find(x => x.closest('a,button,[role=button],[role=link]')) || exact[0];
+      const target = el && (el.closest('a,button,[role=button],[role=link]') || el);
+      if (!target) return false;
+      target.scrollIntoView({block:'center'});
+      target.click();
+      return true;
+    }""", label)
+    if clicked:
+        page.wait_for_timeout(1200)
+        return
     raise RuntimeError(f"menu item not found: {label}")
 
 

@@ -253,4 +253,32 @@ npx wrangler d1 execute kyoten --remote --command \
     └── app.js
 ```
 
+## SaverStats の日次収集
+
+画面右上の歯車から、Asia / Europe / America のプレイヤー数・ギルド数・
+Main Class Popularity (Top 1000) の推移を確認できる。
+期間とサーバーを選択でき、職別の線は凡例から表示を切り替えられる。
+同画面の「Excelでダウンロード」には日次サマリとTop1000職の明細が入る。
+
+初回のみ次を実行する。
+
+```bash
+npx wrangler d1 migrations apply kyoten --remote
+npx wrangler secret put STATS_INGEST_TOKEN
+```
+
+GitHub Actions のリポジトリSecretsには次を登録する。
+
+- `DBONK_USERNAME` / `DBONK_PASSWORD`: DBonkログイン情報
+- `STATS_INGEST_URL`: `https://<Worker URL>/api/saver-stats/ingest`
+- `STATS_INGEST_TOKEN`: Worker側に設定したものと同じ長いランダム値
+
+`.github/workflows/collect-saver-stats.yml` は毎日 01:20（日本時間）に実行される。
+手動実行にも対応する。収集は3サーバーがすべて成功した時だけ送信されるため、
+途中失敗で一部サーバーだけが記録されることはない。
+
+Top1000職は通常のテーブルだけでなく、SVGラベル、ApexCharts、Highchartsの
+描画後データも順に探索する。抽出人数の合計が900〜1100に入らない場合は、
+壊れた値を保存せずActionを失敗させる。
+
 `npx tsc --noEmit` で型チェックできる。

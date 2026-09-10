@@ -18,13 +18,13 @@
 
 ## 現在の未完了箇所
 
-ローカルの収集・検証は完了。GitHub Actionsでの実送信と公開サイト確認が未完了。
-この端末のGitHub CLIトークンは無効になっているため、再認証またはGitHub Web UIからの
-手動実行が必要。
+ローカルの収集・検証は完了し、修正は
+[PR #5](https://github.com/Lily-0619/bdm-node-war-tracker/pull/5) に反映済み。
+`main`へのマージ、GitHub Actionsでの実送信、公開サイト確認が未完了。
 
 ## 次に行う作業
 
-1. 変更をGitHubへ反映する。
+1. PR #5を`main`へマージする。
 2. GitHub Actionsの `Collect SaverStats` を手動実行する。
 3. `STATS_INGEST_URL`への送信成功と、D1へ3地域分が保存されたことを確認する。
 4. 公開サイトのSaverStats画面・期間指定グラフ・Excel出力を確認する。

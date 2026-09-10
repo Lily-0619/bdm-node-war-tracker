@@ -178,7 +178,10 @@ def extract_classes(page: Page) -> list[dict[str, Any]]:
           echarts: !!window.echarts,
           plotly: !!window.Plotly,
           apexInstances: Array.isArray(window.Apex?._chartInstances) ? window.Apex._chartInstances.length : 0,
-          highchartInstances: Array.isArray(window.Highcharts?.charts) ? window.Highcharts.charts.filter(Boolean).length : 0
+          highchartInstances: Array.isArray(window.Highcharts?.charts) ? window.Highcharts.charts.filter(Boolean).length : 0,
+          resources: [...new Set(performance.getEntriesByType('resource').map(entry => {
+            try { return new URL(entry.name).pathname; } catch (_) { return ''; }
+          }).filter(path => path && /stat|server|api|ajax|json|php/i.test(path)))].slice(-30)
         })""")
         raise RuntimeError(
             f"Main Class Popularity extraction failed "

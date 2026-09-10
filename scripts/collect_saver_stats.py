@@ -181,7 +181,7 @@ def collect(page: Page, server: str) -> dict[str, Any]:
             "total_players": stat_number(page, "TOTAL PLAYERS"),
             "active_players": stat_number(page, "ACTIVE PLAYERS (1 MONTH)"),
             "total_guilds": stat_number(page, "TOTAL GUILDS"),
-            "active_guilds": stat_number(page, "ACTIVE GUILDS (1 MONTH)"),
+            "active_guilds": stat_number(page, "ACTIVE GUILDS"),
             "classes": extract_classes(page)}
 
 

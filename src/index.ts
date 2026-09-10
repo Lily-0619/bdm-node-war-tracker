@@ -11,11 +11,16 @@ import {
 import { fullWorkbook, initialHoldingsTemplateCsv } from "./export";
 import { Ctx, Router, html, json, redirect, setCookieHeader, text } from "./router";
 import { renderLogin, renderPage } from "./views";
+import {
+  loadSaverStats, renderSaverStatsPage, saverJsonError, saverWorkbook,
+  saveSaverSnapshots, validSaverPayload,
+} from "./saver";
 
 export interface Env {
   DB: D1Database;
   ASSETS?: Fetcher;
   EDIT_PASSWORD?: string;
+  STATS_INGEST_TOKEN?: string;
   APP_TIMEZONE_OFFSET?: string;   // 例 "9"（日本時間）
 }
 
@@ -147,6 +152,55 @@ router.post("/login", async (c) => {
 
 router.get("/logout", () =>
   redirect("/", { "Set-Cookie": setCookieHeader(COOKIE, "", { maxAge: 0 }) }));
+
+// ---------------------------------------------------------------- SaverStats
+router.get("/saver-stats", () => html(renderSaverStatsPage()));
+
+function dateQuery(value: string | null): string | undefined {
+  return value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined;
+}
+
+router.get("/api/saver-stats", async (c) => {
+  const from = dateQuery(c.query("from"));
+  const to = dateQuery(c.query("to"));
+  if ((c.query("from") && !from) || (c.query("to") && !to)) {
+    return saverJsonError("日付は YYYY-MM-DD 形式で指定してください");
+  }
+  if (from && to && from > to) return saverJsonError("開始日は終了日以前にしてください");
+  return json(await loadSaverStats(c.env.DB, from, to));
+});
+
+async function sameSecret(left: string, right: string): Promise<boolean> {
+  const digest = async (value: string) => new Uint8Array(await crypto.subtle.digest(
+    "SHA-256", new TextEncoder().encode(value),
+  ));
+  const [a, b] = await Promise.all([digest(left), digest(right)]);
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  return diff === 0;
+}
+
+router.post("/api/saver-stats/ingest", async (c) => {
+  const configured = c.env.STATS_INGEST_TOKEN;
+  const supplied = c.req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+  if (!configured || !supplied || !(await sameSecret(configured, supplied))) {
+    return saverJsonError("認証に失敗しました", 401);
+  }
+  const payload = await c.json<unknown>();
+  if (!validSaverPayload(payload)) return saverJsonError("取得データの形式が正しくありません");
+  await saveSaverSnapshots(c.env.DB, payload);
+  return json({ ok: true, saved: payload.length });
+});
+
+router.get("/saver-stats/export.xlsx", async (c) => {
+  const data = await loadSaverStats(c.env.DB);
+  const today = localToday(c.env);
+  return new Response(saverWorkbook(data), { headers: {
+    "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "Content-Disposition": `attachment; filename="saver-stats-${today}.xlsx"`,
+    "Cache-Control": "no-store",
+  }});
+});
 
 // ---------------------------------------------------------------- Excel（全データ1ファイル）
 router.get("/export.xlsx", async (c) => {

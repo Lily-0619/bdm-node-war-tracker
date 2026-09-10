@@ -1,3 +1,4 @@
+2026-09-06　W オアシスステップ　L DEMIIGODS혼혈, Elemento
 2026-08-30　W ーリベリオンー　L CRUSHSA
 2026-08-23　W ーリベリオンー　L EIemento, Etërnîty
 2026-08-16　W EIemento　L ーリベリオンー, ZirconiA

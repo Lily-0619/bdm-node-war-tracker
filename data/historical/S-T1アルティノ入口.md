@@ -1,3 +1,4 @@
+2026-09-06　W ーArch　L FLORISTS, Revenant, ZirconiA, 黄昏のえりしおん
 2026-08-30　W Revenant　L Elemento, FLORISTS, ZirconiA, 黄昏のえりしおん
 2026-08-23　W FLORISTS　L Revenant, ZirconiA, Pandora
 2026-08-16　W Revenant　L 黒の太陽, DarkChaos, 一SPY乂FäMILY一

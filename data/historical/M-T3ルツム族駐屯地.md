@@ -1,3 +1,4 @@
+2026-09-07　W PokemonGO　L cobraXverse, 微笑Party, 當惡魔遇到殺手貓, 美孚冰室
 2026-08-31　W PokemonGO　L 一SUN一, 當惡魔遇到殺手貓
 2026-08-24　W PokemonGO　L 當惡魔遇到殺手貓, 雲淡風輕o
 2026-08-17　W 當惡魔遇到殺手貓　L No Bidder

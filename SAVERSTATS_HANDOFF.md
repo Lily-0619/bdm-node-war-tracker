@@ -9,30 +9,25 @@
 - GitHub Actionsによる毎日実行を追加済み（`.github/workflows/collect-saver-stats.yml`）
 - DBankへの自動ログイン成功
 - DBank内の `Settings → View Server → Server Stats` への自動移動成功
-- TOTAL PLAYERS、ACTIVE PLAYERS、TOTAL GUILDS、ACTIVE GUILDSの画面読み取りまで確認済み
+- `#viewserver` を指定し、ASIA / EUROPE / AMERICAを確実に切り替えるよう修正済み
+- TOTAL PLAYERS、ACTIVE PLAYERS、TOTAL GUILDS、ACTIVE GUILDSを「数値 → ラベル」のDOM順で取得
+- Main Class Popularity (Top 1000) をamCharts 4の元データから取得
+- 3地域の連続ドライラン成功（クラス合計: ASIA 997 / EUROPE 992 / AMERICA 964）
+- `.env` のBOM付きUTF-8読込と、ログイン前例外時の診断処理を修正
 - 既存のサイトデータは削除・置換していない
 
 ## 現在の未完了箇所
 
-`scripts/collect_saver_stats.py` の `extract_classes()`。
-
-Main Class Popularity (Top 1000) の職名候補は取得できているが、現在拾っている数値の合計が約276で、Top1000の人数データになっていない。そのため、誤データをD1へ保存しないよう合計値検証で停止している。
-
-DBankの職グラフは次の構造だった。
-
-- 独自SVG
-- ApexCharts、Highcharts、Chart.js、ECharts、Plotlyではない
-- 最大SVGには多数の `text`、`path`、少数の `aria-label` がある
-- 別のデータAPIは確認できず、認証後HTML内に直接描画されている
+ローカルの収集・検証は完了し、修正は
+[PR #5](https://github.com/Lily-0619/bdm-node-war-tracker/pull/5) に反映済み。
+`main`へのマージ、GitHub Actionsでの実送信、公開サイト確認が未完了。
 
 ## 次に行う作業
 
-1. `extract_classes()` でTop1000グラフのSVGを特定する。
-2. 各職のSVG要素をホバーまたはクリックし、表示されるツールチップから職名と人数を取得する。
-3. 全職の人数合計が900〜1100になることを確認する。
-4. ASIA、EUROPE、AMERICAの3地域を連続取得する。
-5. `STATS_INGEST_URL`へ送信し、D1へ3地域分が保存されたことを確認する。
-6. 公開サイトのSaverStats画面・期間指定グラフ・Excel出力を確認する。
+1. PR #5を`main`へマージする。
+2. GitHub Actionsの `Collect SaverStats` を手動実行する。
+3. `STATS_INGEST_URL`への送信成功と、D1へ3地域分が保存されたことを確認する。
+4. 公開サイトのSaverStats画面・期間指定グラフ・Excel出力を確認する。
 
 ## 再開方法
 

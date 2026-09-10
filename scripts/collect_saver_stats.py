@@ -99,12 +99,24 @@ def open_menu(page: Page, name: str) -> None:
 def set_server(page: Page, server: str) -> None:
     open_menu(page, "Setting")
     page.get_by_text(re.compile(r"View Server", re.I)).first.wait_for(timeout=10000)
-    # Prefer a native/select-like control, then fall back to visible server labels.
+    # DBank has two similar server selectors: #selserver changes the account's
+    # home server, while #viewserver changes the statistics being viewed.
+    view_server = page.locator("select#viewserver")
+    if view_server.count():
+        label = f"Server - {server.title()}"
+        options = view_server.first.locator("option").all_inner_texts()
+        if label in options:
+            view_server.first.select_option(label=label)
+            page.wait_for_timeout(1500)
+            return
+
+    # Fallback for a future markup change.
     selects = page.locator("select")
     for i in range(selects.count()):
         options = selects.nth(i).locator("option").all_inner_texts()
-        if any(server.lower() in x.lower() for x in options):
-            option = next(x for x in options if server.lower() in x.lower())
+        live_options = [x for x in options if x.strip().lower() == f"server - {server.lower()}"]
+        if live_options:
+            option = live_options[0]
             selects.nth(i).select_option(label=option); page.wait_for_timeout(1500); return
     click_text(page, "View Server")
     aliases = {"ASIA": ("Asia",), "EUROPE": ("Europe", "European"), "AMERICA": ("America", "North America")}
@@ -123,8 +135,19 @@ def number_after(body: str, label: str) -> int:
     return int(match.group(1).replace(",", ""))
 
 
+def number_before(body: str, label: str) -> int:
+    match = re.search(rf"([\d,]+)\s*{re.escape(label)}", body, re.I)
+    if not match:
+        raise RuntimeError(f"stat not found: {label}")
+    return int(match.group(1).replace(",", ""))
+
+
 def stat_number(page: Page, label: str) -> int:
     body = page.locator("body").inner_text()
+    try:
+        return number_before(body, label)
+    except RuntimeError:
+        pass
     try:
         return number_after(body, label)
     except RuntimeError:
@@ -145,10 +168,87 @@ def stat_number(page: Page, label: str) -> int:
     raise RuntimeError(f"stat not found: {label}")
 
 
+def chart_diagnostics(page: Page) -> dict[str, Any]:
+    """Return opt-in, bounded SVG metadata without dumping page HTML or credentials."""
+    return page.evaluate(r"""() => {
+      const clean = value => (value || '').replace(/\s+/g, ' ').trim();
+      const clip = (value, limit = 240) => clean(value).slice(0, limit);
+      const chartSummary = (name, instance) => {
+        if (!instance) return {name, available: false};
+        const series = instance.series?.values || [];
+        return {
+          name,
+          available: true,
+          className: instance.className || instance.constructor?.name || '',
+          data: Array.isArray(instance.data) ? instance.data.slice(0, 120) : [],
+          series: series.map(item => ({
+            name: item.name || '',
+            dataFields: {...(item.dataFields || {})},
+            dataItems: (item.dataItems?.values || []).slice(0, 120).map(value => ({
+              categoryX: value.categoryX,
+              categoryY: value.categoryY,
+              valueX: value.valueX,
+              valueY: value.valueY,
+              dataContext: value.dataContext
+            }))
+          }))
+        };
+      };
+      const heading = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6,div,p,span')]
+        .filter(el => clean(el.textContent).toUpperCase().includes('MAIN CLASS POPULARITY'))
+        .sort((a, b) => clean(a.textContent).length - clean(b.textContent).length)[0];
+      const headingTrail = [];
+      for (let el = heading, depth = 0; el && depth < 5; el = el.parentElement, depth++) {
+        headingTrail.push({tag: el.tagName, id: el.id, class: clip(el.className, 120), text: clip(el.innerText)});
+      }
+      return {
+        headingTrail,
+        chartGlobals: Object.keys(window).filter(key => /chart|graph|d3|plot|vis/i.test(key)).slice(0, 100),
+        chartInstances: ['chart', 'chart2', 'chart3', 'chart4'].map(name => chartSummary(name, window[name])),
+        am4Registry: (window.am4core?.registry?.baseSprites || []).map((item, index) => chartSummary(`registry-${index}`, item)),
+        svgs: [...document.querySelectorAll('svg')].map((svg, index) => ({svg, index}))
+          .filter(({svg}) => svg.getBoundingClientRect().width >= 1000)
+          .map(({svg, index}) => {
+          const box = svg.getBoundingClientRect();
+          const attrs = el => Object.fromEntries([...el.attributes]
+            .filter(attr => /^(class|role|aria-|data-|fill|stroke|transform|x|y|width|height|viewBox)/i.test(attr.name))
+            .map(attr => [attr.name, clip(attr.value, 160)]));
+          return {
+            index,
+            box: {x: Math.round(box.x), y: Math.round(box.y), width: Math.round(box.width), height: Math.round(box.height)},
+            parent: {tag: svg.parentElement?.tagName, id: svg.parentElement?.id || '', class: clip(svg.parentElement?.className, 120), text: clip(svg.parentElement?.innerText)},
+            attrs: attrs(svg),
+            texts: [...svg.querySelectorAll('text')].map(el => clip(el.textContent, 120)).filter(Boolean).slice(0, 220),
+            labelled: [...svg.querySelectorAll('[aria-label],[title],title')].map(el => ({
+              tag: el.tagName, text: clip(el.getAttribute('aria-label') || el.getAttribute('title') || el.textContent, 180), attrs: attrs(el)
+            })).slice(0, 100),
+            shapes: [...svg.querySelectorAll('path,rect,circle')].slice(0, 12).map(el => ({
+              tag: el.tagName, attrs: attrs(el), dLength: (el.getAttribute('d') || '').length
+            }))
+          };
+        })
+      };
+    }""")
+
+
 def extract_classes(page: Page) -> list[dict[str, Any]]:
     raw = page.evaluate("""() => {
       const clean = s => (s || '').replace(/\\s+/g, ' ').trim();
       const out = [];
+      // DBank renders its class charts with amCharts 4. The registry retains
+      // the source rows even when SVG labels overlap or are visually hidden.
+      const sprites = window.am4core?.registry?.baseSprites || [];
+      const candidates = sprites.map(sprite => Array.isArray(sprite.data) ? sprite.data : [])
+        .map(data => data.map(row => [clean(String(row?.name || '')), String(row?.count ?? '')])
+          .filter(([name, count]) => name && /^[0-9][0-9,]*$/.test(count)))
+        .filter(rows => rows.length >= 10 && rows.length <= 100)
+        .filter(rows => {
+          const total = rows.reduce((sum, row) => sum + Number(row[1].replaceAll(',', '')), 0);
+          return total >= 900 && total <= 1100;
+        });
+      if (candidates.length === 1) return candidates[0];
+
+      // Fallbacks for a future chart-library or markup change.
       document.querySelectorAll('table tr,[role=row]').forEach(row => {
         const cells = [...row.querySelectorAll('td,[role=cell]')].map(x => clean(x.textContent));
         if (cells.length >= 2 && /^\\d[\\d,]*$/.test(cells[cells.length-1])) out.push([cells[cells.length-2], cells[cells.length-1]]);
@@ -174,6 +274,8 @@ def extract_classes(page: Page) -> list[dict[str, Any]]:
         if name and digits and not ignored.search(name): merged[name] = int(digits)
     result = [{"class_name": name, "player_count": count, "sort_order": i} for i, (name, count) in enumerate(merged.items())]
     if not result or not 900 <= sum(x["player_count"] for x in result) <= 1100:
+        if os.getenv("SAVERSTATS_DEBUG", "0") == "1":
+            print("CHART_DIAGNOSTIC:", json.dumps(chart_diagnostics(page), ensure_ascii=False))
         meta = page.evaluate("""() => ({
           canvas: document.querySelectorAll('canvas').length,
           svg: document.querySelectorAll('svg').length,
@@ -184,6 +286,11 @@ def extract_classes(page: Page) -> list[dict[str, Any]]:
           plotly: !!window.Plotly,
           apexInstances: Array.isArray(window.Apex?._chartInstances) ? window.Apex._chartInstances.length : 0,
           highchartInstances: Array.isArray(window.Highcharts?.charts) ? window.Highcharts.charts.filter(Boolean).length : 0,
+          am4Datasets: (window.am4core?.registry?.baseSprites || []).map(sprite => {
+            const rows = Array.isArray(sprite.data) ? sprite.data : [];
+            const counts = rows.map(row => Number(String(row?.count ?? '').replaceAll(',', ''))).filter(Number.isFinite);
+            return {rows: rows.length, countRows: counts.length, countSum: counts.reduce((sum, value) => sum + value, 0)};
+          }),
           svgStructure: [...document.querySelectorAll('svg')].map(svg => ({
             text: svg.querySelectorAll('text').length,
             path: svg.querySelectorAll('path').length,
@@ -223,13 +330,22 @@ def collect(page: Page, server: str) -> dict[str, Any]:
         timeout=30000,
     )
     page.wait_for_timeout(1200)
+    heading = re.search(r"\b(Asia|Europe|America)\s+Server Stats\b", page.locator("body").inner_text(), re.I)
+    if not heading or heading.group(1).upper() != server:
+        actual = heading.group(1).upper() if heading else "UNKNOWN"
+        raise RuntimeError(f"server switch failed: expected {server}, got {actual}")
     now = datetime.now(timezone(timedelta(hours=9)))
-    return {"server": server, "captured_date": now.date().isoformat(), "captured_at": now.isoformat(),
-            "total_players": stat_number(page, "TOTAL PLAYERS"),
-            "active_players": stat_number(page, "ACTIVE PLAYERS (1 MONTH)"),
-            "total_guilds": stat_number(page, "TOTAL GUILDS"),
-            "active_guilds": stat_number(page, "ACTIVE GUILDS"),
-            "classes": extract_classes(page)}
+    snapshot = {"server": server, "captured_date": now.date().isoformat(), "captured_at": now.isoformat(),
+                "total_players": stat_number(page, "TOTAL PLAYERS"),
+                "active_players": stat_number(page, "ACTIVE PLAYERS (1 MONTH)"),
+                "total_guilds": stat_number(page, "TOTAL GUILDS"),
+                "active_guilds": stat_number(page, "ACTIVE GUILDS (1 MONTH)"),
+                "classes": extract_classes(page)}
+    if snapshot["active_players"] > snapshot["total_players"]:
+        raise RuntimeError(f"invalid player totals for {server}")
+    if snapshot["active_guilds"] > snapshot["total_guilds"]:
+        raise RuntimeError(f"invalid guild totals for {server}")
+    return snapshot
 
 
 def post(payload: list[dict[str, Any]]) -> None:
@@ -240,10 +356,14 @@ def post(payload: list[dict[str, Any]]) -> None:
 
 
 def main() -> None:
-    load_dotenv()
+    # Windows editors commonly save .env files with a UTF-8 BOM. Without
+    # utf-8-sig, python-dotenv treats the BOM as part of the first key.
+    load_dotenv(encoding="utf-8-sig")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=os.getenv("HEADLESS", "1") != "0")
         page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        frames = []
+        frame_candidates = []
         try:
             login(page)
             # Some DBank sessions replace the login page and open the dashboard
@@ -259,7 +379,6 @@ def main() -> None:
             # The dashboard is rendered inside an iframe. Choose the frame that
             # contains the navigation labels (or, as fallback, the most text).
             frames = page.frames
-            frame_candidates = []
             for frame in frames:
                 try:
                     text = frame.locator("body").inner_text()
@@ -283,6 +402,11 @@ def main() -> None:
                 "known_labels": checks,
                 "links": page.locator("a").count(),
                 "buttons": page.locator("button").count(),
+                "selects": page.evaluate("""() => [...document.querySelectorAll('select')].map(select => ({
+                  id: select.id, name: select.name, visible: !!(select.offsetWidth || select.offsetHeight),
+                  selected: select.selectedOptions[0]?.textContent?.trim() || '',
+                  options: [...select.options].map(option => option.textContent.trim()).slice(0, 20)
+                }))"""),
                 "frames": len(frames),
                 "frame_scores": [[score, length] for score, length, _ in frame_candidates],
                 "html_length": len(page.content()),
@@ -290,7 +414,14 @@ def main() -> None:
             raise
         finally:
             browser.close()
-    post(payload); print(json.dumps({"ok": True, "servers": [x["server"] for x in payload]}))
+    summary = [{"server": item["server"], "total_players": item["total_players"],
+                "active_players": item["active_players"], "total_guilds": item["total_guilds"],
+                "active_guilds": item["active_guilds"], "classes": len(item["classes"]),
+                "class_total": sum(row["player_count"] for row in item["classes"])} for item in payload]
+    if os.getenv("DRY_RUN", "0") == "1":
+        print(json.dumps({"ok": True, "dry_run": True, "summary": summary}))
+        return
+    post(payload); print(json.dumps({"ok": True, "summary": summary}))
 
 
 if __name__ == "__main__": main()

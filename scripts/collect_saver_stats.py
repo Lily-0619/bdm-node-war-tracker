@@ -138,7 +138,7 @@ def stat_number(page: Page, label: str) -> int:
         .slice(0, 20);
     }""", label)
     for text in texts:
-        numbers = [int(x.replace(",", "")) for x in re.findall(r"\\d[\\d,]*", text)]
+        without_period = re.sub(r"\\(?\\s*1\\s+MONTH\\s*\\)?", "", text, flags=re.I)\n        numbers = [int(x.replace(",", "")) for x in re.findall(r"\\d[\\d,]*", without_period)]
         values = [value for value in numbers if value > 1]
         if values:
             return values[-1]

@@ -169,7 +169,21 @@ def extract_classes(page: Page) -> list[dict[str, Any]]:
         if name and digits and not ignored.search(name): merged[name] = int(digits)
     result = [{"class_name": name, "player_count": count, "sort_order": i} for i, (name, count) in enumerate(merged.items())]
     if not result or not 900 <= sum(x["player_count"] for x in result) <= 1100:
-        raise RuntimeError(f"Main Class Popularity extraction failed (rows={len(result)}, sum={sum(x['player_count'] for x in result)})")
+        meta = page.evaluate("""() => ({
+          canvas: document.querySelectorAll('canvas').length,
+          svg: document.querySelectorAll('svg').length,
+          apex: !!window.Apex,
+          highcharts: !!window.Highcharts,
+          chartjs: !!window.Chart,
+          echarts: !!window.echarts,
+          plotly: !!window.Plotly,
+          apexInstances: Array.isArray(window.Apex?._chartInstances) ? window.Apex._chartInstances.length : 0,
+          highchartInstances: Array.isArray(window.Highcharts?.charts) ? window.Highcharts.charts.filter(Boolean).length : 0
+        })""")
+        raise RuntimeError(
+            f"Main Class Popularity extraction failed "
+            f"(rows={len(result)}, sum={sum(x['player_count'] for x in result)}, meta={meta})"
+        )
     return result
 
 

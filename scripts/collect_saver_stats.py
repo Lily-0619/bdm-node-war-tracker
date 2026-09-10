@@ -5,6 +5,7 @@ import json
 import os
 import re
 import urllib.request
+from urllib.parse import urlsplit
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -154,7 +155,24 @@ def main() -> None:
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=os.getenv("HEADLESS", "1") != "0")
         page = browser.new_page(viewport={"width": 1440, "height": 1000})
-        login(page); payload = [collect(page, server) for server in SERVERS]; browser.close()
+        try:
+            login(page)
+            payload = [collect(page, server) for server in SERVERS]
+        except Exception:
+            location = urlsplit(page.url)
+            checks = {}
+            for label in ("Setting", "Settings", "Server Stats", "View Server", "Asia", "Logout", "Login"):
+                checks[label] = page.get_by_text(re.compile(rf"^\\s*{re.escape(label)}\\s*$", re.I)).count()
+            print("DIAGNOSTIC:", json.dumps({
+                "page": f"{location.scheme}://{location.netloc}{location.path}",
+                "login_form": page.locator("input[type='password']").count(),
+                "known_labels": checks,
+                "links": page.locator("a").count(),
+                "buttons": page.locator("button").count(),
+            }))
+            raise
+        finally:
+            browser.close()
     post(payload); print(json.dumps({"ok": True, "servers": [x["server"] for x in payload]}))
 
 

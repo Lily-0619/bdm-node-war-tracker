@@ -1,3 +1,4 @@
+2026-09-10　W ーArch　L FLORISTS, 雲淡風輕o
 2026-09-03　W FLORISTS　L 阿公店
 2026-08-27　W ーArch　L 
 2026-08-20　W 一Arch　L PokemonGo, 阿公店

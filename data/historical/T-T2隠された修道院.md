@@ -1,3 +1,4 @@
+2026-09-10　W 天機　L Astrklotho, 氣噗噗讓玻璃心碎一地
 2026-09-03　W 氣噗噗讓玻璃心碎一地　L Pandora, Restart, 天機, 柿一門
 2026-08-27　W 天機　L Restart, ーEspoirー, 柿一門, 氣噗噗讓玻璃心碎一地
 2026-08-20　W Restart　L FLORISTS, Pandora, Maverickz, 義勇

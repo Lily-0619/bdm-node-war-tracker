@@ -167,6 +167,21 @@ def main() -> None:
                 except Exception:
                     continue
             page.wait_for_timeout(1000)
+            # The dashboard is rendered inside an iframe. Choose the frame that
+            # contains the navigation labels (or, as fallback, the most text).
+            frames = page.frames
+            frame_candidates = []
+            for frame in frames:
+                try:
+                    text = frame.locator("body").inner_text()
+                    score = sum(label.lower() in text.lower() for label in ("Server Stats", "Setting", "Guild Ranking"))
+                    frame_candidates.append((score, len(text), frame))
+                except Exception:
+                    continue
+            if frame_candidates:
+                score, _, dashboard = max(frame_candidates, key=lambda item: (item[0], item[1]))
+                if score:
+                    page = dashboard
             payload = [collect(page, server) for server in SERVERS]
         except Exception:
             location = urlsplit(page.url)
@@ -179,8 +194,8 @@ def main() -> None:
                 "known_labels": checks,
                 "links": page.locator("a").count(),
                 "buttons": page.locator("button").count(),
-                "pages": len(page.context.pages),
-                "frames": len(page.frames),
+                "frames": len(frames),
+                "frame_scores": [[score, length] for score, length, _ in frame_candidates],
                 "html_length": len(page.content()),
             }))
             raise

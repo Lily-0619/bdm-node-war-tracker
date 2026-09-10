@@ -179,6 +179,20 @@ def extract_classes(page: Page) -> list[dict[str, Any]]:
           plotly: !!window.Plotly,
           apexInstances: Array.isArray(window.Apex?._chartInstances) ? window.Apex._chartInstances.length : 0,
           highchartInstances: Array.isArray(window.Highcharts?.charts) ? window.Highcharts.charts.filter(Boolean).length : 0,
+          svgStructure: [...document.querySelectorAll('svg')].map(svg => ({
+            text: svg.querySelectorAll('text').length,
+            path: svg.querySelectorAll('path').length,
+            rect: svg.querySelectorAll('rect').length,
+            circle: svg.querySelectorAll('circle').length,
+            title: svg.querySelectorAll('title').length,
+            aria: svg.querySelectorAll('[aria-label]').length,
+            htmlLength: svg.outerHTML.length
+          })).sort((a,b) => b.htmlLength - a.htmlLength).slice(0, 5),
+          framework: {
+            angular: !!document.querySelector('[ng-version]'),
+            react: !!document.querySelector('[data-reactroot]') || !!document.querySelector('[id=root]'),
+            vue: !!document.querySelector('[data-v-app]')
+          },
           resources: [...new Set(performance.getEntriesByType('resource').map(entry => {
             try { return new URL(entry.name).pathname; } catch (_) { return ''; }
           }).filter(path => path && /stat|server|api|ajax|json|php/i.test(path)))].slice(-30)

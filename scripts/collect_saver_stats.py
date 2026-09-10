@@ -176,6 +176,17 @@ def extract_classes(page: Page) -> list[dict[str, Any]]:
 def collect(page: Page, server: str) -> dict[str, Any]:
     set_server(page, server); open_menu(page, "Server Stats")
     page.get_by_text(re.compile(r"TOTAL PLAYERS", re.I)).first.wait_for(timeout=15000)
+    page.wait_for_function(
+        """() => {
+          const text = document.body.innerText.toUpperCase();
+          return text.includes('ACTIVE PLAYERS') &&
+                 text.includes('TOTAL GUILDS') &&
+                 text.includes('ACTIVE GUILDS') &&
+                 text.includes('MAIN CLASS POPULARITY');
+        }""",
+        timeout=30000,
+    )
+    page.wait_for_timeout(1200)
     now = datetime.now(timezone(timedelta(hours=9)))
     return {"server": server, "captured_date": now.date().isoformat(), "captured_at": now.isoformat(),
             "total_players": stat_number(page, "TOTAL PLAYERS"),

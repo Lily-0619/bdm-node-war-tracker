@@ -138,8 +138,8 @@ def stat_number(page: Page, label: str) -> int:
         .slice(0, 20);
     }""", label)
     for text in texts:
-        without_period = re.sub(r"\\(?\\s*1\\s+MONTH\\s*\\)?", "", text, flags=re.I)
-        numbers = [int(x.replace(",", "")) for x in re.findall(r"\\d[\\d,]*", without_period)]
+        without_period = text.upper().replace("(1 MONTH)", "").replace("1 MONTH", "")
+        numbers = [int(x.replace(",", "")) for x in re.findall(r"\d[\d,]*", without_period)]
         if numbers:
             return numbers[-1]
     raise RuntimeError(f"stat not found: {label}")
@@ -240,7 +240,7 @@ def main() -> None:
             location = urlsplit(page.url)
             checks = {}
             for label in ("Setting", "Settings", "Server Stats", "View Server", "Asia", "Logout", "Login"):
-                checks[label] = page.get_by_text(re.compile(rf"^\\s*{re.escape(label)}\\s*$", re.I)).count()
+                checks[label] = page.get_by_text(re.compile(rf"^\s*{re.escape(label)}\s*$", re.I)).count()
             print("DIAGNOSTIC:", json.dumps({
                 "page": f"{location.scheme}://{location.netloc}{location.path}",
                 "login_form": page.locator("input[type='password']").count(),

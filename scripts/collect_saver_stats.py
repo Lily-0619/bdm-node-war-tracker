@@ -123,6 +123,28 @@ def number_after(body: str, label: str) -> int:
     return int(match.group(1).replace(",", ""))
 
 
+def stat_number(page: Page, label: str) -> int:
+    body = page.locator("body").inner_text()
+    try:
+        return number_after(body, label)
+    except RuntimeError:
+        pass
+    texts = page.evaluate("""label => {
+      const wanted = label.toLowerCase().replace(/[^a-z0-9]+/g, '');
+      return [...document.querySelectorAll('div,section,article,li,td,p,span')]
+        .map(el => (el.innerText || '').trim())
+        .filter(text => text && text.toLowerCase().replace(/[^a-z0-9]+/g, '').includes(wanted))
+        .sort((a,b) => a.length - b.length)
+        .slice(0, 20);
+    }""", label)
+    for text in texts:
+        numbers = [int(x.replace(",", "")) for x in re.findall(r"\\d[\\d,]*", text)]
+        values = [value for value in numbers if value > 1]
+        if values:
+            return values[-1]
+    raise RuntimeError(f"stat not found: {label}")
+
+
 def extract_classes(page: Page) -> list[dict[str, Any]]:
     raw = page.evaluate("""() => {
       const clean = s => (s || '').replace(/\\s+/g, ' ').trim();
@@ -154,13 +176,12 @@ def extract_classes(page: Page) -> list[dict[str, Any]]:
 def collect(page: Page, server: str) -> dict[str, Any]:
     set_server(page, server); open_menu(page, "Server Stats")
     page.get_by_text(re.compile(r"TOTAL PLAYERS", re.I)).first.wait_for(timeout=15000)
-    body = page.locator("body").inner_text()
     now = datetime.now(timezone(timedelta(hours=9)))
     return {"server": server, "captured_date": now.date().isoformat(), "captured_at": now.isoformat(),
-            "total_players": number_after(body, "TOTAL PLAYERS"),
-            "active_players": number_after(body, "ACTIVE PLAYERS (1 MONTH)"),
-            "total_guilds": number_after(body, "TOTAL GUILDS"),
-            "active_guilds": number_after(body, "ACTIVE GUILDS (1 MONTH)"),
+            "total_players": stat_number(page, "TOTAL PLAYERS"),
+            "active_players": stat_number(page, "ACTIVE PLAYERS (1 MONTH)"),
+            "total_guilds": stat_number(page, "TOTAL GUILDS"),
+            "active_guilds": stat_number(page, "ACTIVE GUILDS (1 MONTH)"),
             "classes": extract_classes(page)}
 
 

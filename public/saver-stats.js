@@ -166,6 +166,142 @@
     host.append(legend, chart);
   }
 
+  function buildClassesBySnapshot() {
+    const result = new Map();
+    loaded.classes.forEach(item => {
+      if (!result.has(item.snapshot_id)) result.set(item.snapshot_id, new Map());
+      const name = aliases[item.class_name] || item.class_name;
+      const values = result.get(item.snapshot_id);
+      values.set(name, (values.get(name) || 0) + item.player_count);
+    });
+    return result;
+  }
+
+  function renderLatestTopClasses(latest, classesBySnap) {
+    const host = el("latest-class-top5");
+    if (!latest) {
+      host.innerHTML = "";
+      return;
+    }
+    const values = classesBySnap.get(latest.id) || new Map();
+    const ranking = classDefs.map(def => ({ ...def, value: values.get(def.name) || 0 }))
+      .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name))
+      .slice(0, 5);
+    host.innerHTML = `<div class="top5-head"><h3>最新データ 使用者数TOP5</h3><small>${latest.captured_date}</small></div><div class="class-top5">` +
+      ranking.map((item, index) => `<article><b>${index + 1}</b><img src="${item.icon}" alt=""><span><strong>${item.name}</strong><small>${item.code}</small></span><em>${fmt(item.value)}人</em></article>`).join("") +
+      "</div>";
+  }
+
+  async function downloadClassChartPng() {
+    if (!loaded) return;
+    const button = el("stats-png");
+    const original = button.textContent;
+    button.disabled = true;
+    button.textContent = "PNG作成中…";
+    try {
+      const server = el("stats-server").value;
+      const snapshots = loaded.snapshots.filter(snapshot => snapshot.server === server);
+      if (!snapshots.length) throw new Error("PNGにするデータがありません。");
+      const classesBySnap = buildClassesBySnapshot();
+      const rows = [...snapshots].reverse();
+      const minSegmentW = 76;
+      const pixelsPerPlayer = 3;
+      const labelW = 180, rightW = 150, padding = 42;
+      const rowH = 72, barH = 46, headerH = 160;
+      const legendCols = 5, legendRowH = 46;
+      const legendH = Math.ceil(classDefs.length / legendCols) * legendRowH + 80;
+      const rowSegments = rows.map(snapshot => {
+        const values = classesBySnap.get(snapshot.id) || new Map();
+        const segments = classDefs.map(def => {
+          const value = values.get(def.name) || 0;
+          return { ...def, value, width: value > 0 ? Math.max(value * pixelsPerPlayer, minSegmentW) : 0 };
+        });
+        return { snapshot, segments, width: segments.reduce((sum, item) => sum + item.width, 0) };
+      });
+      const bandW = Math.max(3000, ...rowSegments.map(row => row.width));
+      const canvas = document.createElement("canvas");
+      canvas.width = padding + labelW + bandW + rightW + padding;
+      canvas.height = headerH + rows.length * rowH + legendH + padding;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("画像を作成できませんでした。");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#1f2933";
+      ctx.font = "bold 34px Meiryo, sans-serif";
+      ctx.fillText("職 Top1000 帯グラフ", padding, 54);
+      ctx.font = "bold 26px Meiryo, sans-serif";
+      ctx.fillText(`サーバー: ${server}`, padding, 98);
+      const from = el("stats-from").value || rows[rows.length - 1].captured_date;
+      const to = el("stats-to").value || rows[0].captured_date;
+      ctx.font = "24px Meiryo, sans-serif";
+      ctx.fillText(`期間: ${from} ～ ${to}`, padding, 134);
+
+      rowSegments.forEach((row, rowIndex) => {
+        const y = headerH + rowIndex * rowH + (rowH - barH) / 2;
+        ctx.fillStyle = "#26332d";
+        ctx.font = "bold 22px Meiryo, sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(row.snapshot.captured_date, padding + labelW - 16, y + 31);
+        let x = padding + labelW;
+        row.segments.forEach(item => {
+          if (!item.width) return;
+          ctx.fillStyle = classColors.get(item.name) || "#667085";
+          ctx.fillRect(x, y, item.width, barH);
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, item.width, barH);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "bold 18px Arial, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(item.code, x + item.width / 2, y + 29);
+          x += item.width;
+        });
+        const total = row.segments.reduce((sum, item) => sum + item.value, 0);
+        ctx.fillStyle = "#26332d";
+        ctx.font = "bold 22px Meiryo, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(`${fmt(total)}人`, x + 14, y + 31);
+      });
+
+      const legendTop = headerH + rows.length * rowH + 42;
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#1f2933";
+      ctx.font = "bold 25px Meiryo, sans-serif";
+      ctx.fillText("職カラー・略称", padding, legendTop);
+      const colW = (canvas.width - padding * 2) / legendCols;
+      classDefs.forEach((def, index) => {
+        const col = index % legendCols;
+        const row = Math.floor(index / legendCols);
+        const x = padding + col * colW;
+        const y = legendTop + 28 + row * legendRowH;
+        ctx.fillStyle = classColors.get(def.name) || "#667085";
+        ctx.fillRect(x, y, 30, 30);
+        ctx.fillStyle = "#26332d";
+        ctx.font = "bold 18px Arial, sans-serif";
+        ctx.fillText(def.code, x + 42, y + 22);
+        ctx.font = "18px Meiryo, sans-serif";
+        ctx.fillText(def.name, x + 82, y + 22);
+      });
+
+      const blob = await new Promise((resolve, reject) =>
+        canvas.toBlob(value => value ? resolve(value) : reject(new Error("PNG変換に失敗しました。")), "image/png")
+      );
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `SaverStats_${server}_${from}_${to}.png`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      showError(error);
+    } finally {
+      button.disabled = false;
+      button.textContent = original;
+    }
+  }
+
   function render() {
     const server = el("stats-server").value;
     const snapshots = loaded.snapshots.filter(snapshot => snapshot.server === server);
@@ -176,14 +312,9 @@
       ["TOTAL GUILDS", latest.total_guilds], ["ACTIVE GUILDS (1 MONTH)", latest.active_guilds],
     ].map(item => `<article><span>${item[0]}</span><strong>${fmt(item[1])}</strong><small>${latest.captured_date}</small></article>`).join("") : "";
 
-    const classesBySnap = new Map();
-    loaded.classes.forEach(item => {
-      if (!classesBySnap.has(item.snapshot_id)) classesBySnap.set(item.snapshot_id, new Map());
-      const name = aliases[item.class_name] || item.class_name;
-      const values = classesBySnap.get(item.snapshot_id);
-      values.set(name, (values.get(name) || 0) + item.player_count);
-    });
+    const classesBySnap = buildClassesBySnapshot();
     combinedClassChart(el("class-chart"), snapshots, classesBySnap);
+    renderLatestTopClasses(latest, classesBySnap);
 
     const metricHost = el("metric-chart"); metricHost.innerHTML = "";
     lineChart(metricHost, dates, snapshots.map(snapshot => snapshot.active_players), "アクティブプレイヤー（1か月）", colors[0]);
@@ -206,6 +337,7 @@
     el("stats-error").textContent = error.message;
   }
   el("stats-apply").onclick = () => load().catch(showError);
+  el("stats-png").onclick = downloadClassChartPng;
   el("stats-server").onchange = () => loaded && render();
   load().catch(showError);
 })();

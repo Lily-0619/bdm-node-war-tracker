@@ -103,7 +103,7 @@
     const rows = [...snapshots].reverse();
     const visibleDefs = classDefs.filter(def => !hiddenClasses.has(def.name));
 
-    const width = 2200, rowH = 58, barH = 38, pad = { l: 96, r: 84, t: 14, b: 14 };
+    const width = 3000, rowH = 58, barH = 38, pad = { l: 96, r: 84, t: 14, b: 14 };
     const plotW = width - pad.l - pad.r;
     const height = pad.t + pad.b + rows.length * rowH;
     const svg = svgEl("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "日付別の職Top1000帯グラフ" });

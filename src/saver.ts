@@ -144,7 +144,7 @@ export function renderSaverStatsPage(): string {
 <main class="stats-wrap"><header class="stats-header"><div><h1>SaverStats 推移</h1><p>Asia・Europe・America の日次取得データ</p></div><a class="btn excel" href="/saver-stats/export.xlsx">Excelでダウンロード</a></header>
 <section class="stats-controls"><label>開始日 <input id="stats-from" type="date"></label><label>終了日 <input id="stats-to" type="date"></label><label>サーバー <select id="stats-server"><option value="ASIA">Asia</option><option value="EUROPE">Europe</option><option value="AMERICA">America</option></select></label><button class="btn primary" id="stats-apply">表示</button></section>
 <div id="stats-error" class="stats-error" hidden></div><section id="stats-latest" class="stats-kpis"></section>
-<section class="stats-card"><div class="stats-card-head"><h2>職 Top1000 推移</h2><p class="stats-note">各職とも新しい日付が上です。棒の右端を結ぶ線で人数の変化を確認できます。</p></div><div id="class-chart" class="class-chart-grid"></div></section>
+<section class="stats-card"><div class="stats-card-head"><h2>職 Top1000 推移</h2><div class="stats-card-actions"><p class="stats-note">全職を同じ日付軸に表示します。凡例を押すと職ごとに表示を切り替えられます。</p><a class="btn" href="https://github.com/Lily-0619/bdm-node-war-tracker/edit/main/public/class-colors.md" target="_blank" rel="noopener">色設定MDを編集</a></div></div><div id="class-chart"></div></section>
 <section class="stats-card"><div class="stats-card-head"><h2>サーバー状況の推移</h2></div><div id="metric-chart" class="metric-chart-grid"></div></section>
 </main>
 <script src="/saver-stats.js"></script></body></html>`;

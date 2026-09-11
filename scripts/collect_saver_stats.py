@@ -365,7 +365,12 @@ def collect(page: Page, server: str) -> dict[str, Any]:
 
 def post(payload: list[dict[str, Any]]) -> None:
     request = urllib.request.Request(env("STATS_INGEST_URL"), data=json.dumps(payload).encode(), method="POST",
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {env('STATS_INGEST_TOKEN')}"})
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "bdm-node-war-tracker/1.0 (GitHub Actions)",
+            "Authorization": f"Bearer {env('STATS_INGEST_TOKEN')}",
+        })
     with urllib.request.urlopen(request, timeout=30) as response:
         if response.status != 200: raise RuntimeError(f"ingest failed: HTTP {response.status}")
 

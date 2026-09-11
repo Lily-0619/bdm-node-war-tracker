@@ -103,7 +103,7 @@
     const rows = [...snapshots].reverse();
     const visibleDefs = classDefs.filter(def => !hiddenClasses.has(def.name));
 
-    const width = 3000, rowH = 58, barH = 38, pad = { l: 96, r: 84, t: 14, b: 14 };
+    const width = 3000, rowH = 68, barH = 52, pad = { l: 96, r: 84, t: 14, b: 14 };
     const plotW = width - pad.l - pad.r;
     const height = pad.t + pad.b + rows.length * rowH;
     const svg = svgEl("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "日付別の職Top1000帯グラフ" });
@@ -112,6 +112,9 @@
     rows.forEach((snapshot, rowIndex) => {
       const values = classesBySnap.get(snapshot.id) || new Map();
       const total = visibleDefs.reduce((sum, def) => sum + (values.get(def.name) || 0), 0);
+      const positiveCount = visibleDefs.filter(def => (values.get(def.name) || 0) > 0).length;
+      const minSegmentW = 64;
+      const flexibleW = Math.max(0, plotW - positiveCount * minSegmentW);
       const y = pad.t + rowIndex * rowH + (rowH - barH) / 2;
       const date = svgEl("text", { x: pad.l - 10, y: y + barH / 2 + 4, "text-anchor": "end", class: "band-date" });
       date.textContent = snapshot.captured_date;
@@ -122,7 +125,7 @@
       visibleDefs.forEach(def => {
         const value = values.get(def.name) || 0;
         if (!value || !total) return;
-        const segmentW = value / total * plotW;
+        const segmentW = minSegmentW + value / total * flexibleW;
         const color = classColors.get(def.name) || "#667085";
         const rect = svgEl("rect", {
           x: pad.l + offset, y, width: segmentW, height: barH,
@@ -131,14 +134,18 @@
         rect.appendChild(svgEl("title")).textContent =
           `${snapshot.captured_date} / ${def.name}: ${fmt(value)}人（${(value / total * 100).toFixed(1)}%）`;
         svg.appendChild(rect);
-        if (segmentW >= 25) {
-          const label = svgEl("text", {
-            x: pad.l + offset + segmentW / 2, y: y + barH / 2 + 4,
-            "text-anchor": "middle", class: "band-code",
-          });
-          label.textContent = def.code;
-          svg.appendChild(label);
-        }
+        const codeLabel = svgEl("text", {
+          x: pad.l + offset + segmentW / 2, y: y + 20,
+          "text-anchor": "middle", class: "band-code",
+        });
+        codeLabel.textContent = def.code;
+        svg.appendChild(codeLabel);
+        const countLabel = svgEl("text", {
+          x: pad.l + offset + segmentW / 2, y: y + 41,
+          "text-anchor": "middle", class: "band-count",
+        });
+        countLabel.textContent = `${fmt(value)}人`;
+        svg.appendChild(countLabel);
         offset += segmentW;
       });
 
@@ -207,7 +214,7 @@
       const minSegmentW = 76;
       const pixelsPerPlayer = 3;
       const labelW = 180, rightW = 150, padding = 42;
-      const rowH = 72, barH = 46, headerH = 160;
+      const rowH = 88, barH = 62, headerH = 160;
       const legendCols = 5, legendRowH = 46;
       const legendH = Math.ceil(classDefs.length / legendCols) * legendRowH + 80;
       const rowSegments = rows.map(snapshot => {
@@ -241,7 +248,7 @@
         ctx.fillStyle = "#26332d";
         ctx.font = "bold 22px Meiryo, sans-serif";
         ctx.textAlign = "right";
-        ctx.fillText(row.snapshot.captured_date, padding + labelW - 16, y + 31);
+        ctx.fillText(row.snapshot.captured_date, padding + labelW - 16, y + 39);
         let x = padding + labelW;
         row.segments.forEach(item => {
           if (!item.width) return;
@@ -251,16 +258,18 @@
           ctx.lineWidth = 1;
           ctx.strokeRect(x, y, item.width, barH);
           ctx.fillStyle = "#ffffff";
-          ctx.font = "bold 18px Arial, sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText(item.code, x + item.width / 2, y + 29);
+          ctx.font = "bold 18px Arial, sans-serif";
+          ctx.fillText(item.code, x + item.width / 2, y + 25);
+          ctx.font = "bold 17px Meiryo, sans-serif";
+          ctx.fillText(`${fmt(item.value)}人`, x + item.width / 2, y + 50);
           x += item.width;
         });
         const total = row.segments.reduce((sum, item) => sum + item.value, 0);
         ctx.fillStyle = "#26332d";
         ctx.font = "bold 22px Meiryo, sans-serif";
         ctx.textAlign = "left";
-        ctx.fillText(`${fmt(total)}人`, x + 14, y + 31);
+        ctx.fillText(`${fmt(total)}人`, x + 14, y + 39);
       });
 
       const legendTop = headerH + rows.length * rowH + 42;

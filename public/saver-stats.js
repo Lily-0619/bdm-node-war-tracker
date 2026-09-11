@@ -13,6 +13,15 @@
   ].map(([code, name]) => ({ code, name, icon: `/class-button/${code}.svg` }));
   const aliases = { Askeia: "Mystic", Zayed: "Hashashin", Sura: "Ninja" };
   const colors = ["#2878b5", "#a855f7"];
+  const fallbackClassColors = [
+    "#e53935", "#1e88e5", "#43a047", "#fb8c00", "#8e24aa", "#00acc1",
+    "#f4511e", "#3949ab", "#7cb342", "#d81b60", "#00897b", "#6d4c41",
+    "#5e35b1", "#039be5", "#c0ca33", "#fdd835", "#546e7a", "#ff7043",
+    "#26a69a", "#ab47bc", "#29b6f6", "#9ccc65", "#ffa726", "#ec407a",
+    "#7e57c2", "#26c6da", "#8d6e63", "#78909c", "#66bb6a", "#ef5350",
+  ];
+  const classColors = new Map(classDefs.map((def, index) => [def.name, fallbackClassColors[index]]));
+  const hiddenClasses = new Set();
   let loaded = null;
 
   const el = id => document.getElementById(id);
@@ -63,46 +72,98 @@
     panel.appendChild(svg); host.appendChild(panel);
   }
 
-  function classTimeline(def, snapshots, classesBySnap) {
-    const panel = document.createElement("section");
-    panel.className = "class-timeline";
-    panel.innerHTML = `<h3><img src="${def.icon}" alt="">${def.name}<small>${def.code}</small></h3>`;
-    const rows = [...snapshots].reverse().map(snapshot => ({
-      date: snapshot.captured_date,
-      value: classesBySnap.get(snapshot.id)?.get(def.name) || 0,
+
+  async function loadClassColors() {
+    try {
+      const response = await fetch("/class-colors.md", { cache: "no-cache" });
+      if (!response.ok) return;
+      const markdown = await response.text();
+      markdown.split(/\r?\n/).forEach(line => {
+        const match = line.match(/^\|\s*([^|]+?)\s*\|\s*`?(#[0-9a-f]{6})`?\s*\|/i);
+        if (!match) return;
+        const name = match[1].trim();
+        if (classDefs.some(def => def.name === name)) classColors.set(name, match[2]);
+      });
+    } catch (_) {
+      // 設定ファイルが読めない場合は組み込み色を使う。
+    }
+  }
+
+  function combinedClassChart(host, snapshots, classesBySnap) {
+    host.innerHTML = "";
+    if (!snapshots.length) {
+      host.innerHTML = "<p>この期間のデータはありません。</p>";
+      return;
+    }
+
+    const legend = document.createElement("div");
+    legend.className = "chart-legend class-legend";
+    const chart = document.createElement("div");
+    chart.className = "svg-chart tall class-combined-chart";
+    const dates = snapshots.map(snapshot => snapshot.captured_date);
+    const series = classDefs.map(def => ({
+      ...def,
+      color: classColors.get(def.name) || "#667085",
+      values: snapshots.map(snapshot => classesBySnap.get(snapshot.id)?.get(def.name) || 0),
     }));
-    if (!rows.length) {
-      panel.insertAdjacentHTML("beforeend", "<p>この期間のデータはありません。</p>");
-      return panel;
+
+    const width = 1180, height = 520, pad = { l: 62, r: 24, t: 22, b: 48 };
+    const plotW = width - pad.l - pad.r, plotH = height - pad.t - pad.b;
+    const max = Math.max(...series.flatMap(item => item.values), 1);
+    const roundedMax = Math.ceil(max / 50) * 50;
+    const x = index => pad.l + (dates.length === 1 ? plotW / 2 : index * plotW / (dates.length - 1));
+    const y = value => pad.t + plotH - value / roundedMax * plotH;
+    const svg = svgEl("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "職Top1000人数の推移" });
+    svg.appendChild(svgEl("title")).textContent = "全職のTop1000人数推移";
+
+    for (let i = 0; i <= 5; i++) {
+      const yy = pad.t + plotH * i / 5;
+      svg.appendChild(svgEl("line", { x1: pad.l, y1: yy, x2: width - pad.r, y2: yy, class: "grid" }));
+      const label = svgEl("text", { x: pad.l - 8, y: yy + 4, "text-anchor": "end" });
+      label.textContent = fmt(Math.round(roundedMax * (1 - i / 5)));
+      svg.appendChild(label);
     }
-    const width = 480, rowH = 38, top = 10, bottom = 10, labelW = 68, valueW = 48;
-    const plotW = width - labelW - valueW, height = top + bottom + rows.length * rowH;
-    const max = Math.max(...rows.map(row => row.value), 1);
-    const barX = labelW, barH = 26;
-    const svg = svgEl("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": `${def.name}のTop1000人数推移` });
-    svg.appendChild(svgEl("title")).textContent = `${def.name}のTop1000人数推移（新しい日付が上）`;
-    const endpoints = [];
-    rows.forEach((row, index) => {
-      const y = top + index * rowH + (rowH - barH) / 2;
-      const barW = row.value ? Math.max(2, row.value / max * plotW) : 0;
-      const date = svgEl("text", { x: labelW - 7, y: y + barH / 2 + 4, "text-anchor": "end", class: "class-date" });
-      date.textContent = row.date.slice(5); svg.appendChild(date);
-      svg.appendChild(svgEl("rect", { x: barX, y, width: plotW, height: barH, class: "class-track" }));
-      const bar = svgEl("rect", { x: barX, y, width: barW, height: barH, class: "class-bar" });
-      bar.appendChild(svgEl("title")).textContent = `${row.date}: ${fmt(row.value)}人`;
-      svg.appendChild(bar);
-      if (barW >= 24) {
-        svg.appendChild(svgEl("image", { href: def.icon, x: barX + Math.max(2, (barW - 22) / 2), y: y + 2, width: 22, height: 22, class: "class-icon" }));
-      }
-      const value = svgEl("text", { x: Math.min(width - 3, barX + barW + 6), y: y + barH / 2 + 4, class: "class-value" });
-      value.textContent = fmt(row.value); svg.appendChild(value);
-      endpoints.push(`${barX + barW},${y + barH / 2}`);
+    dates.forEach((date, index) => {
+      const xx = x(index);
+      svg.appendChild(svgEl("line", { x1: xx, y1: pad.t, x2: xx, y2: height - pad.b, class: "date-grid" }));
+      const label = svgEl("text", { x: xx, y: height - 18, "text-anchor": "middle" });
+      label.textContent = date.slice(5);
+      svg.appendChild(label);
     });
-    if (endpoints.length > 1) {
-      svg.appendChild(svgEl("polyline", { points: endpoints.join(" "), class: "class-trend", fill: "none" }));
-    }
-    panel.appendChild(svg);
-    return panel;
+
+    series.forEach(item => {
+      const group = svgEl("g", { "data-class": item.name });
+      if (hiddenClasses.has(item.name)) group.style.display = "none";
+      const points = item.values.map((value, index) => `${x(index)},${y(value)}`).join(" ");
+      group.appendChild(svgEl("polyline", {
+        points, fill: "none", stroke: item.color, "stroke-width": 2.5,
+        "stroke-linejoin": "round", "stroke-linecap": "round",
+      }));
+      item.values.forEach((value, index) => {
+        const dot = svgEl("circle", { cx: x(index), cy: y(value), r: 3.5, fill: item.color });
+        dot.appendChild(svgEl("title")).textContent = `${item.name} / ${dates[index]}: ${fmt(value)}人`;
+        group.appendChild(dot);
+      });
+      svg.appendChild(group);
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "legend-item" + (hiddenClasses.has(item.name) ? " off" : "");
+      button.innerHTML = `<i style="background:${item.color}"></i><img src="${item.icon}" alt="">${item.name}`;
+      button.setAttribute("aria-pressed", String(!hiddenClasses.has(item.name)));
+      button.onclick = () => {
+        if (hiddenClasses.has(item.name)) hiddenClasses.delete(item.name);
+        else hiddenClasses.add(item.name);
+        const visible = !hiddenClasses.has(item.name);
+        group.style.display = visible ? "" : "none";
+        button.classList.toggle("off", !visible);
+        button.setAttribute("aria-pressed", String(visible));
+      };
+      legend.appendChild(button);
+    });
+
+    chart.appendChild(svg);
+    host.append(legend, chart);
   }
 
   function render() {
@@ -122,8 +183,7 @@
       const values = classesBySnap.get(item.snapshot_id);
       values.set(name, (values.get(name) || 0) + item.player_count);
     });
-    const classHost = el("class-chart"); classHost.innerHTML = "";
-    classDefs.forEach(def => classHost.appendChild(classTimeline(def, snapshots, classesBySnap)));
+    combinedClassChart(el("class-chart"), snapshots, classesBySnap);
 
     const metricHost = el("metric-chart"); metricHost.innerHTML = "";
     lineChart(metricHost, dates, snapshots.map(snapshot => snapshot.active_players), "アクティブプレイヤー（1か月）", colors[0]);
@@ -137,6 +197,7 @@
     const response = await fetch("/api/saver-stats?" + query);
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "取得に失敗しました");
+    await loadClassColors();
     loaded = data; render();
   }
 

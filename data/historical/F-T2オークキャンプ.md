@@ -1,3 +1,4 @@
+2026-09-11　W VainqueurJP　L 
 2026-09-04　W VainqueurJP　L 
 2026-08-28　W VainqueurJP　L Orzeca, 一SUN一
 2026-08-21　W Orzeca　L xAEGISx, 一SUN一

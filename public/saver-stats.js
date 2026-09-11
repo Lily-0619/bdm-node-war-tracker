@@ -99,65 +99,65 @@
     const legend = document.createElement("div");
     legend.className = "chart-legend class-legend";
     const chart = document.createElement("div");
-    chart.className = "svg-chart tall class-combined-chart";
-    const dates = snapshots.map(snapshot => snapshot.captured_date);
-    const series = classDefs.map(def => ({
-      ...def,
-      color: classColors.get(def.name) || "#667085",
-      values: snapshots.map(snapshot => classesBySnap.get(snapshot.id)?.get(def.name) || 0),
-    }));
+    chart.className = "svg-chart class-band-chart";
+    const rows = [...snapshots].reverse();
+    const visibleDefs = classDefs.filter(def => !hiddenClasses.has(def.name));
 
-    const width = 1180, height = 520, pad = { l: 62, r: 24, t: 22, b: 48 };
-    const plotW = width - pad.l - pad.r, plotH = height - pad.t - pad.b;
-    const max = Math.max(...series.flatMap(item => item.values), 1);
-    const roundedMax = Math.ceil(max / 50) * 50;
-    const x = index => pad.l + (dates.length === 1 ? plotW / 2 : index * plotW / (dates.length - 1));
-    const y = value => pad.t + plotH - value / roundedMax * plotH;
-    const svg = svgEl("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "職Top1000人数の推移" });
-    svg.appendChild(svgEl("title")).textContent = "全職のTop1000人数推移";
+    const width = 1180, rowH = 54, barH = 34, pad = { l: 86, r: 74, t: 14, b: 14 };
+    const plotW = width - pad.l - pad.r;
+    const height = pad.t + pad.b + rows.length * rowH;
+    const svg = svgEl("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": "日付別の職Top1000帯グラフ" });
+    svg.appendChild(svgEl("title")).textContent = "日付ごとに1本で表示した職Top1000構成";
 
-    for (let i = 0; i <= 5; i++) {
-      const yy = pad.t + plotH * i / 5;
-      svg.appendChild(svgEl("line", { x1: pad.l, y1: yy, x2: width - pad.r, y2: yy, class: "grid" }));
-      const label = svgEl("text", { x: pad.l - 8, y: yy + 4, "text-anchor": "end" });
-      label.textContent = fmt(Math.round(roundedMax * (1 - i / 5)));
-      svg.appendChild(label);
-    }
-    dates.forEach((date, index) => {
-      const xx = x(index);
-      svg.appendChild(svgEl("line", { x1: xx, y1: pad.t, x2: xx, y2: height - pad.b, class: "date-grid" }));
-      const label = svgEl("text", { x: xx, y: height - 18, "text-anchor": "middle" });
-      label.textContent = date.slice(5);
-      svg.appendChild(label);
+    rows.forEach((snapshot, rowIndex) => {
+      const values = classesBySnap.get(snapshot.id) || new Map();
+      const total = visibleDefs.reduce((sum, def) => sum + (values.get(def.name) || 0), 0);
+      const y = pad.t + rowIndex * rowH + (rowH - barH) / 2;
+      const date = svgEl("text", { x: pad.l - 10, y: y + barH / 2 + 4, "text-anchor": "end", class: "band-date" });
+      date.textContent = snapshot.captured_date;
+      svg.appendChild(date);
+      svg.appendChild(svgEl("rect", { x: pad.l, y, width: plotW, height: barH, rx: 3, class: "band-track" }));
+
+      let offset = 0;
+      visibleDefs.forEach(def => {
+        const value = values.get(def.name) || 0;
+        if (!value || !total) return;
+        const segmentW = value / total * plotW;
+        const color = classColors.get(def.name) || "#667085";
+        const rect = svgEl("rect", {
+          x: pad.l + offset, y, width: segmentW, height: barH,
+          fill: color, class: "band-segment", "data-class": def.name,
+        });
+        rect.appendChild(svgEl("title")).textContent =
+          `${snapshot.captured_date} / ${def.name}: ${fmt(value)}人（${(value / total * 100).toFixed(1)}%）`;
+        svg.appendChild(rect);
+        if (segmentW >= 25) {
+          const label = svgEl("text", {
+            x: pad.l + offset + segmentW / 2, y: y + barH / 2 + 4,
+            "text-anchor": "middle", class: "band-code",
+          });
+          label.textContent = def.code;
+          svg.appendChild(label);
+        }
+        offset += segmentW;
+      });
+
+      const totalLabel = svgEl("text", { x: width - pad.r + 10, y: y + barH / 2 + 4, class: "band-total" });
+      totalLabel.textContent = `${fmt(total)}人`;
+      svg.appendChild(totalLabel);
     });
 
-    series.forEach(item => {
-      const group = svgEl("g", { "data-class": item.name });
-      if (hiddenClasses.has(item.name)) group.style.display = "none";
-      const points = item.values.map((value, index) => `${x(index)},${y(value)}`).join(" ");
-      group.appendChild(svgEl("polyline", {
-        points, fill: "none", stroke: item.color, "stroke-width": 2.5,
-        "stroke-linejoin": "round", "stroke-linecap": "round",
-      }));
-      item.values.forEach((value, index) => {
-        const dot = svgEl("circle", { cx: x(index), cy: y(value), r: 3.5, fill: item.color });
-        dot.appendChild(svgEl("title")).textContent = `${item.name} / ${dates[index]}: ${fmt(value)}人`;
-        group.appendChild(dot);
-      });
-      svg.appendChild(group);
-
+    classDefs.forEach(def => {
+      const color = classColors.get(def.name) || "#667085";
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "legend-item" + (hiddenClasses.has(item.name) ? " off" : "");
-      button.innerHTML = `<i style="background:${item.color}"></i><img src="${item.icon}" alt="">${item.name}`;
-      button.setAttribute("aria-pressed", String(!hiddenClasses.has(item.name)));
+      button.className = "legend-item" + (hiddenClasses.has(def.name) ? " off" : "");
+      button.innerHTML = `<i style="background:${color}"></i><img src="${def.icon}" alt="">${def.name}`;
+      button.setAttribute("aria-pressed", String(!hiddenClasses.has(def.name)));
       button.onclick = () => {
-        if (hiddenClasses.has(item.name)) hiddenClasses.delete(item.name);
-        else hiddenClasses.add(item.name);
-        const visible = !hiddenClasses.has(item.name);
-        group.style.display = visible ? "" : "none";
-        button.classList.toggle("off", !visible);
-        button.setAttribute("aria-pressed", String(visible));
+        if (hiddenClasses.has(def.name)) hiddenClasses.delete(def.name);
+        else hiddenClasses.add(def.name);
+        combinedClassChart(host, snapshots, classesBySnap);
       };
       legend.appendChild(button);
     });

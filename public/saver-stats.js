@@ -16,7 +16,7 @@
   let loaded = null;
 
   const el = id => document.getElementById(id);
-  const fmt = n => Number(n).toLocaleString("ja-JP");
+  const fmt = n => n == null || Number(n) < 0 ? "—" : Number(n).toLocaleString("ja-JP");
   const svgEl = (name, attrs = {}) => {
     const node = document.createElementNS("http://www.w3.org/2000/svg", name);
     Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, String(value)));

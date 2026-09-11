@@ -110,8 +110,9 @@ export function saverWorkbook(data: Awaited<ReturnType<typeof loadSaverStats>>):
   const summaryRows: Sheet["rows"] = [
     ["取得日", "サーバー", "総プレイヤー", "アクティブプレイヤー（1か月）", "総ギルド", "アクティブギルド（1か月）", "取得日時"]
       .map((v) => ({ v, s: S.HEADER })),
-    ...data.snapshots.map((r) => [r.captured_date, r.server, r.total_players, r.active_players,
-      r.total_guilds, r.active_guilds, r.captured_at]),
+    ...data.snapshots.map((r) => [r.captured_date, r.server,
+      r.total_players < 0 ? "—" : r.total_players, r.active_players,
+      r.total_guilds < 0 ? "—" : r.total_guilds, r.active_guilds, r.captured_at]),
   ];
   const sourceById = new Map<number, SaverClassRow[]>();
   data.classes.forEach((row) => {

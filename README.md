@@ -259,7 +259,7 @@ npx wrangler d1 execute kyoten --remote --command \
 
 画面右上の歯車から、Asia / Europe / America のプレイヤー数・ギルド数・
 Main Class Popularity (Top 1000) の推移を確認できる。
-期間とサーバーを選択でき、全職を同じ日付軸の1つのグラフで比較できる。
+期間とサーバーを選択でき、日付ごとに1本の積み上げ帯グラフで職構成を比較できる。
 職別の線は凡例から表示を切り替えられる。
 グラフの色は [`public/class-colors.md`](./public/class-colors.md) のカラーコードを書き換えるだけで変更できる。
 同画面の「Excelでダウンロード」には日次サマリとTop1000職の明細が入る。

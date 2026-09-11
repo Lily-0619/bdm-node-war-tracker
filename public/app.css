@@ -174,4 +174,5 @@ table.master input.w44{width:44px;text-align:center;}
 .metric-chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.metric-panel{min-width:0}.metric-panel h3{font-size:13px;margin:4px 0}.metric-panel svg{display:block;width:100%;height:auto}.metric-panel text{font:10px Meiryo,sans-serif;fill:#667}.metric-panel .grid{stroke:#e2e8e4;stroke-width:1}
 .stats-error{background:#fff0f0;border-left:3px solid #a33;padding:10px;margin-bottom:12px;color:#822}.stats-note{font-size:11px;color:var(--ink-soft)}
 
-@media(max-width:1100px){.class-top5{grid-template-columns:repeat(3,minmax(0,1fr))}}\n@media(max-width:760px){.stats-kpis{grid-template-columns:1fr 1fr}.stats-wrap{padding:12px}.metric-chart-grid{grid-template-columns:1fr}.stats-card-actions{justify-content:flex-start}.class-top5{grid-template-columns:1fr 1fr}}
+@media(max-width:1100px){.class-top5{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.stats-kpis{grid-template-columns:1fr 1fr}.stats-wrap{padding:12px}.metric-chart-grid{grid-template-columns:1fr}.stats-card-actions{justify-content:flex-start}.class-top5{grid-template-columns:1fr 1fr}}

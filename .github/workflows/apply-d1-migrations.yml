@@ -23,3 +23,19 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Verify historical SaverStats rows
+        run: >
+          npx wrangler@4 d1 execute kyoten --remote --command
+          "SELECT COUNT(*) AS snapshots,
+          SUM(CASE WHEN total_players = -1 AND total_guilds = -1 THEN 1 ELSE 0 END) AS missing_totals
+          FROM saver_snapshots
+          WHERE source_url = 'historical-excel';
+          SELECT COUNT(*) AS classes,
+          SUM(CASE WHEN c.player_count = 0 THEN 1 ELSE 0 END) AS zero_classes
+          FROM saver_class_counts c
+          JOIN saver_snapshots s ON s.id = c.snapshot_id
+          WHERE s.source_url = 'historical-excel';"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

@@ -4,6 +4,8 @@ from __future__ import annotations
 import json
 import os
 import sqlite3
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -16,12 +18,23 @@ DB_PATH = Path(os.environ["KARTE_DB_PATH"])
 
 def request(path: str, payload: dict | None = None) -> dict:
     data = json.dumps(payload).encode() if payload is not None else None
-    req = urllib.request.Request(
-        API + path, data=data, method="POST" if data is not None else "GET",
-        headers={"Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(req, timeout=60) as response:
-        return json.load(response)
+    for attempt in range(6):
+        req = urllib.request.Request(
+            API + path, data=data, method="POST" if data is not None else "GET",
+            headers={"Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json",
+                     "User-Agent": "bdm-node-war-tracker/1.0"},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=60) as response:
+                return json.load(response)
+        except urllib.error.HTTPError as exc:
+            if exc.code not in (429, 500, 502, 503, 504) or attempt == 5:
+                raise
+        except (TimeoutError, urllib.error.URLError):
+            if attempt == 5:
+                raise
+        time.sleep(2 ** attempt)
+    raise RuntimeError("request retry exhausted")
 
 
 def main() -> None:

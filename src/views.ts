@@ -171,6 +171,7 @@ export function renderPage(d: PageData): string {
         : '<a class="chip" href="/login" style="color:#fff;text-decoration:none">閲覧のみ（ログイン）</a>'
       : ""}
   <a class="stats-entry" href="/saver-stats" title="SaverStats 推移" aria-label="SaverStats 推移">⚙</a>
+  ${canEdit ? '<a class="chip" href="/guild-karte" style="color:#fff;text-decoration:none">ギルドカルテ解析</a>' : ""}
 </div>
 
 <div class="toolbar">

@@ -1,0 +1,57 @@
+name: Collect Guild Karte
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: D1 karte run id
+        required: true
+
+concurrency:
+  group: collect-guild-karte
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: tracker
+      - uses: actions/checkout@v4
+        with:
+          repository: Lily-0619/bdm-guild-karte-v2
+          ref: master
+          path: guild-karte
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install playwright==1.60.0 openpyxl==3.1.5 python-dotenv==1.2.2
+      - run: python -m playwright install --with-deps chromium
+      - name: Prepare guild list
+        run: cp tracker/config/karte_guilds.txt guild-karte/config/guilds.txt
+      - name: Collect registered guilds
+        working-directory: guild-karte
+        run: xvfb-run -a python src/scraper.py
+        env:
+          DBONK_USERNAME: ${{ secrets.DBONK_USERNAME }}
+          DBONK_PASSWORD: ${{ secrets.DBONK_PASSWORD }}
+      - name: Send results to D1
+        if: always()
+        run: python tracker/scripts/import_guild_karte_run.py
+        env:
+          KARTE_RUN_ID: ${{ inputs.run_id }}
+          KARTE_DB_PATH: guild-karte/data/bdm_guild.sqlite3
+          KARTE_API_BASE: ${{ secrets.KARTE_API_BASE }}
+          KARTE_INGEST_TOKEN: ${{ secrets.KARTE_INGEST_TOKEN }}
+      - name: Track selected family names
+        if: always()
+        run: python tracker/scripts/track_guild_karte_names.py
+        env:
+          DBONK_USERNAME: ${{ secrets.DBONK_USERNAME }}
+          DBONK_PASSWORD: ${{ secrets.DBONK_PASSWORD }}
+          KARTE_RUN_ID: ${{ inputs.run_id }}
+          KARTE_SOURCE_ROOT: guild-karte
+          KARTE_API_BASE: ${{ secrets.KARTE_API_BASE }}
+          KARTE_INGEST_TOKEN: ${{ secrets.KARTE_INGEST_TOKEN }}

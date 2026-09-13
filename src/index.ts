@@ -15,12 +15,18 @@ import {
   loadSaverStats, renderSaverStatsPage, saverJsonError, saverWorkbook,
   saveSaverSnapshots, validSaverPayload,
 } from "./saver";
+import {
+  createKarteRun, karteDashboard, renderKartePage, saveKarteGuild, validKarteGuildInput,
+} from "./karte";
 
 export interface Env {
   DB: D1Database;
   ASSETS?: Fetcher;
   EDIT_PASSWORD?: string;
   STATS_INGEST_TOKEN?: string;
+  KARTE_INGEST_TOKEN?: string;
+  GITHUB_ACTIONS_TOKEN?: string;
+  GITHUB_REPOSITORY?: string;
   APP_TIMEZONE_OFFSET?: string;   // 例 "9"（日本時間）
 }
 
@@ -200,6 +206,196 @@ router.get("/saver-stats/export.xlsx", async (c) => {
     "Content-Disposition": `attachment; filename="saver-stats-${today}.xlsx"`,
     "Cache-Control": "no-store",
   }});
+});
+
+// ---------------------------------------------------------------- ギルドカルテ解析
+router.get("/guild-karte", async (c) => {
+  if (!(await canEdit(c))) return redirect("/login");
+  return html(renderKartePage());
+});
+
+router.get("/api/guild-karte", async (c) => {
+  const denied = await requireEdit(c);
+  if (denied) return denied;
+  return json(await karteDashboard(c.env.DB));
+});
+
+router.get("/api/guild-karte/people", async (c) => {
+  const denied = await requireEdit(c); if (denied) return denied;
+  const q = (c.query("q") ?? "").trim();
+  const result = q
+    ? await c.env.DB.prepare(`SELECT id,current_family_name,tracking_enabled FROM karte_people
+        WHERE current_family_name LIKE ? ORDER BY tracking_enabled DESC,current_family_name LIMIT 100`).bind(`%${q}%`).all()
+    : await c.env.DB.prepare(`SELECT id,current_family_name,tracking_enabled FROM karte_people
+        ORDER BY tracking_enabled DESC,current_family_name LIMIT 100`).all();
+  return json({ people: result.results ?? [] });
+});
+
+router.post("/api/guild-karte/run", async (c) => {
+  const denied = await requireEdit(c);
+  if (denied) return denied;
+  const token = c.env.GITHUB_ACTIONS_TOKEN;
+  const repository = c.env.GITHUB_REPOSITORY ?? "Lily-0619/bdm-node-war-tracker";
+  if (!token) return json({ ok: false, error: "GitHub Actions連携が未設定です" }, 503);
+  const active = await c.env.DB.prepare(
+    "SELECT id FROM karte_runs WHERE status IN ('queued','collecting','analyzing') ORDER BY id DESC LIMIT 1"
+  ).first<{ id: number }>();
+  if (active) return json({ ok: false, error: `実行中です（#${active.id}）` }, 409);
+  const runId = await createKarteRun(c.env.DB);
+  const response = await fetch(`https://api.github.com/repos/${repository}/actions/workflows/collect-guild-karte.yml/dispatches`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "kyoten-tax-board" },
+    body: JSON.stringify({ ref: "main", inputs: { run_id: String(runId) } }),
+  });
+  if (!response.ok) {
+    const detail = await response.text();
+    await c.env.DB.prepare("UPDATE karte_runs SET status='failed',phase='起動失敗',finished_at=CURRENT_TIMESTAMP,error=? WHERE id=?")
+      .bind(detail.slice(0, 1000), runId).run();
+    return json({ ok: false, error: "収集ジョブを起動できませんでした" }, 502);
+  }
+  return json({ ok: true, run_id: runId }, 202);
+});
+
+router.post("/api/guild-karte/ingest/:runId", async (c) => {
+  const supplied = c.req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+  if (!c.env.KARTE_INGEST_TOKEN || !supplied || !(await sameSecret(c.env.KARTE_INGEST_TOKEN, supplied))) {
+    return json({ ok: false, error: "認証に失敗しました" }, 401);
+  }
+  const input = await c.json<unknown>();
+  if (!validKarteGuildInput(input)) return json({ ok: false, error: "取得データの形式が正しくありません" }, 400);
+  await saveKarteGuild(c.env.DB, Number(c.params.runId), input);
+  return json({ ok: true });
+});
+
+router.post("/api/guild-karte/import-run", async (c) => {
+  const supplied = c.req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+  if (!c.env.KARTE_INGEST_TOKEN || !supplied || !(await sameSecret(c.env.KARTE_INGEST_TOKEN, supplied)))
+    return json({ ok: false, error: "認証に失敗しました" }, 401);
+  const result = await c.env.DB.prepare(`INSERT INTO karte_runs(status,phase,total_guilds,started_at)
+    VALUES('analyzing','過去データ移行中',0,CURRENT_TIMESTAMP)`).run();
+  return json({ ok: true, run_id: Number(result.meta.last_row_id) });
+});
+
+router.post("/api/guild-karte/import/:runId", async (c) => {
+  const supplied = c.req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+  if (!c.env.KARTE_INGEST_TOKEN || !supplied || !(await sameSecret(c.env.KARTE_INGEST_TOKEN, supplied)))
+    return json({ ok: false, error: "認証に失敗しました" }, 401);
+  const input = await c.json<unknown>();
+  if (!validKarteGuildInput(input)) return json({ ok: false, error: "移行データの形式が正しくありません" }, 400);
+  await saveKarteGuild(c.env.DB, Number(c.params.runId), input, true);
+  return json({ ok: true });
+});
+
+router.get("/api/guild-karte/job-config/:runId", async (c) => {
+  const supplied = c.req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+  if (!c.env.KARTE_INGEST_TOKEN || !supplied || !(await sameSecret(c.env.KARTE_INGEST_TOKEN, supplied))) {
+    return json({ ok: false, error: "認証に失敗しました" }, 401);
+  }
+  const [guilds, tracked, run] = await Promise.all([
+    c.env.DB.prepare("SELECT name FROM karte_guilds WHERE enabled=1 ORDER BY sort_order,name").all<{ name: string }>(),
+    c.env.DB.prepare("SELECT id,current_family_name FROM karte_people WHERE tracking_enabled=1 ORDER BY id").all(),
+    c.env.DB.prepare("SELECT id,status,failed_guilds FROM karte_runs WHERE id=?").bind(Number(c.params.runId)).first(),
+  ]);
+  return json({ run_id: Number(c.params.runId), run, guilds: (guilds.results ?? []).map(g => g.name), tracked: tracked.results ?? [] });
+});
+
+router.post("/api/guild-karte/progress/:runId", async (c) => {
+  const supplied = c.req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+  if (!c.env.KARTE_INGEST_TOKEN || !supplied || !(await sameSecret(c.env.KARTE_INGEST_TOKEN, supplied))) {
+    return json({ ok: false, error: "認証に失敗しました" }, 401);
+  }
+  const body = await c.json<{ status?: string; phase?: string; current_guild?: string; error?: string;
+    guild_name?: string; failed?: boolean }>();
+  const allowed = new Set(["queued","collecting","analyzing","completed","partial","failed"]);
+  if (body.status && !allowed.has(body.status)) return json({ ok: false, error: "statusが不正です" }, 400);
+  if (body.failed && body.guild_name) {
+    await c.env.DB.prepare("INSERT OR REPLACE INTO karte_run_failures(run_id,guild_name,error) VALUES(?,?,?)")
+      .bind(Number(c.params.runId), body.guild_name, String(body.error ?? "取得失敗").slice(0, 1000)).run();
+    await c.env.DB.prepare("UPDATE karte_runs SET failed_guilds=failed_guilds+1,current_guild=? WHERE id=?")
+      .bind(body.guild_name, Number(c.params.runId)).run();
+  }
+  const finished = body.status && ["completed","partial","failed"].includes(body.status);
+  await c.env.DB.prepare(`UPDATE karte_runs SET status=COALESCE(?,status),phase=COALESCE(?,phase),
+    current_guild=COALESCE(?,current_guild),error=COALESCE(?,error),
+    started_at=CASE WHEN started_at IS NULL AND ? IN ('collecting','analyzing') THEN CURRENT_TIMESTAMP ELSE started_at END,
+    finished_at=CASE WHEN ? THEN CURRENT_TIMESTAMP ELSE finished_at END WHERE id=?`)
+    .bind(body.status ?? null, body.phase ?? null, body.current_guild ?? null, body.error ?? null,
+      body.status ?? null, finished ? 1 : 0, Number(c.params.runId)).run();
+  return json({ ok: true });
+});
+
+router.post("/api/guild-karte/tracking-results/:runId", async (c) => {
+  const supplied = c.req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+  if (!c.env.KARTE_INGEST_TOKEN || !supplied || !(await sameSecret(c.env.KARTE_INGEST_TOKEN, supplied))) {
+    return json({ ok: false, error: "認証に失敗しました" }, 401);
+  }
+  const body = await c.json<{ results?: Array<{ person_id: number; searched_name: string; found_name?: string;
+    found_guild_name?: string; result: string; raw?: unknown }> }>();
+  const allowed = new Set(["found","renamed","not_found","error"]);
+  for (const item of body.results ?? []) {
+    if (!allowed.has(item.result)) continue;
+    await c.env.DB.prepare(`INSERT INTO karte_name_search_results
+      (run_id,person_id,searched_name,found_name,found_guild_name,result,raw_json) VALUES(?,?,?,?,?,?,?)
+      ON CONFLICT(run_id,person_id) DO UPDATE SET found_name=excluded.found_name,
+      found_guild_name=excluded.found_guild_name,result=excluded.result,raw_json=excluded.raw_json,searched_at=CURRENT_TIMESTAMP`)
+      .bind(Number(c.params.runId), item.person_id, item.searched_name, item.found_name ?? null,
+        item.found_guild_name ?? null, item.result, JSON.stringify(item.raw ?? item)).run();
+    if (item.result === "renamed" || item.result === "not_found" || item.result === "error") {
+      const kind = item.result === "renamed" ? "name_change" : "lost";
+      const exists = await c.env.DB.prepare(`SELECT id FROM karte_review_items
+        WHERE old_person_id=? AND run_id=? AND kind=?`).bind(item.person_id, Number(c.params.runId), kind).first();
+      if (!exists) await c.env.DB.prepare(`INSERT INTO karte_review_items
+        (run_id,kind,old_person_id,old_family_name,new_family_name,new_guild_name,status,note)
+        VALUES(?,?,?,?,?,?, 'pending',?)`).bind(Number(c.params.runId), kind, item.person_id,
+          item.searched_name, item.found_name ?? null, item.found_guild_name ?? null,
+          item.result === "error" ? "Name Searchでエラー" : null).run();
+    }
+  }
+  return json({ ok: true });
+});
+
+router.post("/api/guild-karte/tracking/:personId", async (c) => {
+  const denied = await requireEdit(c); if (denied) return denied;
+  const body = await c.json<{ enabled?: boolean }>();
+  await c.env.DB.prepare("UPDATE karte_people SET tracking_enabled=?,updated_at=CURRENT_TIMESTAMP WHERE id=?")
+    .bind(body.enabled ? 1 : 0, Number(c.params.personId)).run();
+  return json({ ok: true });
+});
+
+router.post("/api/guild-karte/reviews/:reviewId", async (c) => {
+  const denied = await requireEdit(c); if (denied) return denied;
+  const body = await c.json<{ decision?: string; note?: string }>();
+  if (!new Set(["same_person","different_person","hold"]).has(body.decision ?? ""))
+    return json({ ok: false, error: "判断が不正です" }, 400);
+  const reviewId = Number(c.params.reviewId);
+  if (body.decision === "same_person") {
+    const review = await c.env.DB.prepare("SELECT old_person_id,new_family_name FROM karte_review_items WHERE id=?")
+      .bind(reviewId).first<{ old_person_id: number; new_family_name: string | null }>();
+    if (!review?.old_person_id || !review.new_family_name) return json({ ok: false, error: "統合先の名前がありません" }, 400);
+    const current = await c.env.DB.prepare(`SELECT p.id FROM karte_people p JOIN karte_person_names n ON n.person_id=p.id
+      WHERE n.family_name=? ORDER BY p.id LIMIT 1`).bind(review.new_family_name).first<{ id: number }>();
+    if (current && current.id !== review.old_person_id) {
+      await c.env.DB.batch([
+        c.env.DB.prepare("UPDATE karte_member_snapshots SET person_id=? WHERE person_id=?").bind(review.old_person_id, current.id),
+        c.env.DB.prepare(`INSERT OR IGNORE INTO karte_person_names(person_id,family_name,source)
+          SELECT ?,family_name,'manual_review' FROM karte_person_names WHERE person_id=?`).bind(review.old_person_id, current.id),
+        c.env.DB.prepare("DELETE FROM karte_people WHERE id=?").bind(current.id),
+        c.env.DB.prepare("UPDATE karte_people SET current_family_name=?,updated_at=CURRENT_TIMESTAMP WHERE id=?")
+          .bind(review.new_family_name, review.old_person_id),
+      ]);
+    } else if (!current) {
+      await c.env.DB.batch([
+        c.env.DB.prepare("INSERT OR IGNORE INTO karte_person_names(person_id,family_name,source) VALUES(?,?,'manual_review')")
+          .bind(review.old_person_id, review.new_family_name),
+        c.env.DB.prepare("UPDATE karte_people SET current_family_name=?,updated_at=CURRENT_TIMESTAMP WHERE id=?")
+          .bind(review.new_family_name, review.old_person_id),
+      ]);
+    }
+  }
+  await c.env.DB.prepare("UPDATE karte_review_items SET status=?,resolved_at=CURRENT_TIMESTAMP,note=? WHERE id=?")
+    .bind(body.decision, body.note ?? "", reviewId).run();
+  return json({ ok: true });
 });
 
 // ---------------------------------------------------------------- Excel（全データ1ファイル）

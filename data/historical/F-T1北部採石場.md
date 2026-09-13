@@ -1,3 +1,4 @@
+2026-09-11　W 義勇　L Demise, ーEspoirー, 月下の集い, 黄昏のえりしおん
 2026-09-04　W ZirconiA　L Lullàby, のら猫, ひよこりあ, シェイド
 2026-08-28　W ZirconiA　L Pandora, Restart, 柿一門, 義勇
 2026-08-21　W ZirconiA　L ーEspoirー, rabbits, ひよこりあ, 義勇

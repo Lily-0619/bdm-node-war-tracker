@@ -1,3 +1,4 @@
+2026-09-11　W 阿公店　L 放置無言出入自由
 2026-09-04　W ーArch　L cobraXverse, 微笑Party
 2026-08-28　W 微笑Party　L cobraXverse
 2026-08-21　W PokemonGo　L Pandora

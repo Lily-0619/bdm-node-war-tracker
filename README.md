@@ -290,33 +290,3 @@ Top1000職はDBankが利用しているamCharts 4の元データから取得し�
 ローカル確認では `DRY_RUN=1` を設定すると、D1へ送信せず3地域の件数と合計を検証できる。
 
 `npx tsc --noEmit` で型チェックできる。
-
-## ギルドカルテ解析
-
-編集ログイン後の「ギルドカルテ解析」から、登録済み29ギルドの一括収集を開始できる。
-処理はGitHub Actionsでバックグラウンド実行され、画面を閉じても継続する。
-CP・FCP・職は取得日時ごとの履歴としてD1へ保存する。Name Searchは管理画面で
-追跡対象にした人物だけに実行し、名前変更候補・追跡不能は管理者の確認待ちにする。
-
-初回セットアップ:
-
-```bash
-npx wrangler d1 migrations apply kyoten --remote
-npx wrangler secret put KARTE_INGEST_TOKEN
-npx wrangler secret put GITHUB_ACTIONS_TOKEN
-```
-
-`GITHUB_ACTIONS_TOKEN`には、このリポジトリのActionsを実行できるfine-grained tokenを設定する。
-GitHub Actions Secretsには次を設定する。
-
-- `KARTE_API_BASE`: Worker URL（例 `https://kyoten-tax-board.example.workers.dev`）
-- `KARTE_INGEST_TOKEN`: Worker側と同じ値
-
-既存SQLiteの初回移行は次で事前確認できる。
-
-```powershell
-python scripts/migrate_guild_karte_sqlite.py E:\bdm-guild-karte\data\bdm_guild.sqlite3 --dry-run
-```
-
-実移行時は`KARTE_API_BASE`と`KARTE_INGEST_TOKEN`を環境変数へ設定し、
-`--dry-run`を外す。再実行しても同じギルド・取得日時は更新され、重複しない。

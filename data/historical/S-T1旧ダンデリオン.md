@@ -1,3 +1,4 @@
+2026-09-13　W ーArch　L シェイド, 美孚冰室
 2026-09-06　W 美孚冰室　L Orzeca, 微笑Party
 2026-08-30　W ーArch　L RL1, SERENITY
 2026-08-23　W シェイド　L 一Arch, SЕRЕNIТY

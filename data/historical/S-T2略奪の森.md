@@ -1,3 +1,4 @@
+2026-09-13　W Döraè่mön　L xAEGISx
 2026-09-06　W xAEGISx　L 
 2026-08-30　W 一SUN一　L Orzeca
 2026-08-23　W Döraè่mön　L cobraXverse

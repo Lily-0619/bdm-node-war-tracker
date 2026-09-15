@@ -1,3 +1,4 @@
+2026-09-13　W Elemento　L CRUSHSA, MÏRÃGË, Revenant, 厶pocalypse
 2026-09-06　W ーArch　L FLORISTS, Revenant, ZirconiA, 黄昏のえりしおん
 2026-08-30　W Revenant　L Elemento, FLORISTS, ZirconiA, 黄昏のえりしおん
 2026-08-23　W FLORISTS　L Revenant, ZirconiA, Pandora

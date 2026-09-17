@@ -1,3 +1,4 @@
+2026-09-14　W FLORISTS　L シェイド, 一SUN一
 2026-09-07　W 一SUN一　L Orzeca, シェイド
 2026-08-31　W シェイド　L xAEGISx, ーArch
 2026-08-24　W シェイド　L 黄昏のえりしおん, FLORISTS

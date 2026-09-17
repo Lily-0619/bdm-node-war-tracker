@@ -1,3 +1,4 @@
+2026-09-14　W Phoenix　L 
 2026-09-07　W Phoenix　L xAEGISx, ーArch
 2026-08-31　W Unity　L Phoenix, VainqueurJP
 2026-08-24　W Phoenix　L Unity, xAEGISx

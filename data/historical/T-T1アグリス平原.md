@@ -1,3 +1,4 @@
+2026-09-17　W 柿一門　L Elemento, Restart, Revenant, 厶pocalypse
 2026-09-10　W 柿一門　L Elemento, Revenant, ーEspoirー, 厶pocalypse
 2026-09-03　W 厶pocalypse　L Elemento, SanctaTerra
 2026-08-27　W EIemento　L 厶pocalypse, Revenant, SanctaTerra, Sangsaka

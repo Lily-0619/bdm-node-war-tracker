@@ -1,3 +1,4 @@
+2026-09-17　W RaиkSS　L Oops, 當惡魔遇到殺手貓
 2026-09-10　W PONYTAIL　L 當惡魔遇到殺手貓
 2026-09-03　W PONYTAIL　L Oops, 一SUN一, 當惡魔遇到殺手貓
 2026-08-27　W RaиkSS　L 當惡魔遇到殺手貓, 雲淡風輕o

@@ -132,14 +132,23 @@ export function renderEnhancementSimulator(): string {
     <section class="dialog-pane" data-pane="result">
       <div id="result-empty" class="result-empty"><b>条件を入力してシミュレーションを開始してください</b><p>平均だけでなく、中央値・P90・P95・在庫切れ率を表示します。</p></div>
       <div id="result-output" hidden>
-        <div class="result-cards"><article><small>平均</small><b id="result-mean">—</b></article><article><small>中央値</small><b id="result-median">—</b></article><article><small>P90</small><b id="result-p90">—</b></article><article><small>P95</small><b id="result-p95">—</b></article></div>
+        <div id="result-explanation" class="result-explanation"></div>
+        <div class="result-cards"><article><small>平均</small><b id="result-mean">—</b><p>完成した試行の平均</p></article><article><small>中央値</small><b id="result-median">—</b><p>完成例の半数が収まる目安</p></article><article><small>P90</small><b id="result-p90">—</b><p>完成例の90%が収まる目安</p></article><article><small>P95</small><b id="result-p95">—</b><p>完成例の95%が収まる目安</p></article></div>
         <div class="result-meta" id="result-meta"></div>
-        <div class="result-chart-wrap"><svg id="result-chart" viewBox="0 0 760 210" role="img" aria-label="消費量の分布"></svg></div>
+        <div class="chart-guide"><b>分布グラフ</b><span>横軸＝必要だった量</span><span>縦軸＝その範囲に入った完成例の数</span><span>棒にカーソルを合わせると件数を確認できます</span></div>
+        <div class="result-chart-wrap"><svg id="result-chart" viewBox="0 0 760 240" role="img" aria-label="消費量の分布"></svg></div>
         <div class="result-table-grid">
           <table class="result-table"><caption>費用・時間</caption><tbody id="cost-results"></tbody></table>
           <table class="result-table"><caption>達成・リスク</caption><tbody id="risk-results"></tbody></table>
         </div>
         <div id="result-warnings" class="result-warnings"></div>
+        <details class="result-help" open><summary>この結果の見方</summary><dl>
+          <dt>平均</dt><dd>完成した試行で必要だった量の平均です。極端に多い結果の影響を受けます。</dd>
+          <dt>中央値</dt><dd>完成した試行を少ない順に並べた中央です。「典型的な結果」の目安です。</dd>
+          <dt>P90／P95</dt><dd>完成した試行の90%／95%が、その値以下に収まったことを表します。準備量は平均よりこちらが安全側です。</dd>
+          <dt>完成率</dt><dd>全試行のうち、在庫・予算・期限などの条件内で目標に到達できた割合です。</dd>
+          <dt>重要</dt><dd>平均・中央値・P90・P95とグラフは、目標まで完成できた試行だけを集計します。未完成の試行は含みません。</dd>
+        </dl></details>
       </div>
     </section>
     <footer><span id="simulation-status">入力条件と結果はこのブラウザに保存できます</span><button id="save-config" type="button" class="secondary-button">条件を保存</button><button id="simulate" type="button" class="simulate-button">シミュレーション開始</button></footer>

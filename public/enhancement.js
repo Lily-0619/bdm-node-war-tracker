@@ -193,16 +193,20 @@ import { validateConfig } from "./enhancement-engine.js";
     return `<tr><th>${label}</th><td>${summary ? formatter(summary.mean) : "—"}</td><td>${summary ? formatter(summary.p90) : "—"}</td></tr>`;
   }
 
-  function renderChart(bins) {
+  function renderChart(bins, axisLabel) {
     const svg = document.getElementById("result-chart");
     if (!bins.length) { svg.innerHTML = '<text x="380" y="105" text-anchor="middle">完成試行がないため分布を表示できません</text>'; return; }
     const maxCount = Math.max(...bins.map(bin => bin.count), 1);
     const width = 700 / bins.length;
-    svg.innerHTML = `<line x1="42" y1="178" x2="742" y2="178" class="axis"/>${bins.map((bin, index) => {
-      const height = 145 * bin.count / maxCount;
+    const ticks = [0, 0.5, 1].map(ratio => {
+      const y = 185 - ratio * 150;
+      return `<line x1="42" y1="${y}" x2="742" y2="${y}" class="grid-line"/><text x="35" y="${y + 3}" text-anchor="end">${formatNumber(maxCount * ratio)}</text>`;
+    }).join("");
+    svg.innerHTML = `${ticks}<line x1="42" y1="185" x2="742" y2="185" class="axis"/>${bins.map((bin, index) => {
+      const height = 150 * bin.count / maxCount;
       const x = 42 + index * width + 2;
-      return `<rect x="${x}" y="${178 - height}" width="${Math.max(1, width - 4)}" height="${height}" rx="2"><title>${formatNumber(bin.from)}～${formatNumber(bin.to)}: ${bin.count}回</title></rect>`;
-    }).join("")}<text x="42" y="200">${formatNumber(bins[0].from)}</text><text x="742" y="200" text-anchor="end">${formatNumber(bins.at(-1).to)}</text>`;
+      return `<rect x="${x}" y="${185 - height}" width="${Math.max(1, width - 4)}" height="${height}" rx="2"><title>${formatNumber(bin.from)}～${formatNumber(bin.to)}: 完成${bin.count}回</title></rect>`;
+    }).join("")}<text x="42" y="205">${formatNumber(bins[0].from)}</text><text x="742" y="205" text-anchor="end">${formatNumber(bins.at(-1).to)}</text><text x="392" y="230" text-anchor="middle">${escapeHtml(axisLabel)} → 多い</text><text x="12" y="110" text-anchor="middle" transform="rotate(-90 12 110)">完成例の数</text>`;
   }
 
   function renderResult(result) {
@@ -214,8 +218,15 @@ import { validateConfig } from "./enhancement-engine.js";
     document.getElementById("result-median").textContent = formatNumber(primary?.median, 0);
     document.getElementById("result-p90").textContent = formatNumber(primary?.p90, 0);
     document.getElementById("result-p95").textContent = formatNumber(primary?.p95, 0);
-    document.getElementById("result-meta").innerHTML = `<b>${result.primaryKey === "normalAttempts" ? "通常強化回数" : "凸素材消費数"}</b><span>完成 ${formatNumber(result.completed)} / ${formatNumber(result.trials)}回</span><span>シード ${result.seed}</span><span>ルール ${result.ruleVersion}</span>${result.exactCheck ? `<span>厳密期待値 ${formatNumber(result.exactCheck.expectedAttempts, 2)}回</span>` : ""}`;
-    renderChart(result.histogram);
+    const primaryLabel = result.primaryKey === "normalAttempts" ? "通常強化回数" : "凸素材消費数";
+    const incomplete = result.trials - result.completed;
+    const reasons = [
+      ["inventory", "在庫切れ"], ["budget", "予算超過"], ["deadline", "期限超過"], ["max_attempts", "最大強化回数超過"],
+    ].map(([key, label]) => ({ label, count: result.terminationCounts[key] || 0 })).sort((a, b) => b.count - a.count);
+    const mainReason = reasons[0];
+    document.getElementById("result-explanation").innerHTML = `<b>今回の結果</b><p><strong>${formatNumber(result.trials)}回中 ${formatNumber(result.completed)}回が完成</strong>し、${formatNumber(incomplete)}回は条件内で完成しませんでした。完成率は${formatNumber(result.completionRate * 100, 2)}%です。</p>${incomplete > 0 ? `<p>未完成の主な理由は「${mainReason.label}」${formatNumber(mainReason.count)}回です。</p>` : ""}<p>下の平均・中央値・P90・P95とグラフは、<strong>完成した${formatNumber(result.completed)}回だけ</strong>を集計しています。</p>`;
+    document.getElementById("result-meta").innerHTML = `<b>${primaryLabel}</b><span>完成 ${formatNumber(result.completed)} / ${formatNumber(result.trials)}回</span><span>シード ${result.seed}</span><span>ルール ${result.ruleVersion}</span>${result.exactCheck ? `<span>厳密期待値 ${formatNumber(result.exactCheck.expectedAttempts, 2)}回</span>` : ""}`;
+    renderChart(result.histogram, primaryLabel);
     document.getElementById("cost-results").innerHTML = `
       <tr><th></th><th>平均</th><th>P90</th></tr>
       ${metricRow("直接支出", result.metrics.directCost, value => `${formatNumber(value)} S`)}
@@ -229,12 +240,15 @@ import { validateConfig } from "./enhancement-engine.js";
       ${metricRow("ヴォルクスV", result.metrics.valksVUsed)}
       ${metricRow("アクラムX", result.metrics.akhramXUsed)}`;
     document.getElementById("risk-results").innerHTML = `
-      <tr><th>完成率</th><td>${formatNumber(result.completionRate * 100, 2)}%</td></tr>
-      <tr><th>在庫切れ率</th><td>${formatNumber(result.inventoryFailureRate * 100, 2)}%</td></tr>
-      <tr><th>予算超過率</th><td>${formatNumber(result.budgetFailureRate * 100, 2)}%</td></tr>
-      <tr><th>期限超過率</th><td>${formatNumber(result.deadlineFailureRate * 100, 2)}%</td></tr>
+      <tr><th>完成率<small>全試行のうち目標に到達</small></th><td>${formatNumber(result.completionRate * 100, 2)}%</td></tr>
+      <tr><th>在庫切れ率<small>素材・券などが不足</small></th><td>${formatNumber(result.inventoryFailureRate * 100, 2)}%</td></tr>
+      <tr><th>予算超過率<small>設定予算を超過</small></th><td>${formatNumber(result.budgetFailureRate * 100, 2)}%</td></tr>
+      <tr><th>期限超過率<small>設定時間内に未完成</small></th><td>${formatNumber(result.deadlineFailureRate * 100, 2)}%</td></tr>
       <tr><th>平均95%信頼区間</th><td>${primary ? `${formatNumber(primary.confidence95[0], 1)}～${formatNumber(primary.confidence95[1], 1)}` : "—"}</td></tr>`;
-    document.getElementById("result-warnings").innerHTML = result.validation.warnings.map(message => `<p>⚠ ${escapeHtml(message)}</p>`).join("");
+    const interpretationWarnings = [];
+    if (result.completionRate < 0.5) interpretationWarnings.push(`完成率が${formatNumber(result.completionRate * 100, 2)}%と低いため、P90・P95は「全試行の90%・95%が完成する量」ではありません。在庫条件の見直しが必要です。`);
+    if (primary && primary.p90 === primary.p95) interpretationWarnings.push("P90とP95が同じ値なのは、その付近に結果が集中したか、在庫上限付近で完成例が区切られたためです。");
+    document.getElementById("result-warnings").innerHTML = [...interpretationWarnings, ...result.validation.warnings].map(message => `<p>⚠ ${escapeHtml(message)}</p>`).join("");
     showTab("result");
   }
 

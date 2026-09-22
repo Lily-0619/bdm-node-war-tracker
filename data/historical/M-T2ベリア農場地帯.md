@@ -1,3 +1,4 @@
+2026-09-21　W PONYTAIL　L VainqueurJP, ZirconiA
 2026-09-14　W TRAITORs　L VainqueurJP, 氣噗噗讓玻璃心碎一地
 2026-09-07　W Döraè่mön　L FLORISTS
 2026-08-31　W PONYTAIL　L No Bidder

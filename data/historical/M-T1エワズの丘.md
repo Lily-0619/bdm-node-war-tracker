@@ -1,3 +1,4 @@
+2026-09-21　W ーリベリオンー　L 微笑Party, 美孚冰室
 2026-09-14　W 美孚冰室　L Demise, 微笑Party
 2026-09-07　W Elemento　L 厶pocalypse
 2026-08-31　W ーリベリオンー　L SERENITY, 放置無言出入自由

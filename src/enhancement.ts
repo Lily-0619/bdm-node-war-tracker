@@ -32,14 +32,14 @@ export function renderEnhancementSimulator(): string {
   <title>闇の精霊 強化シミュレーター</title><link rel="stylesheet" href="/enhancement.css"></head>
   <body><header class="sim-header"><a href="/" class="sim-back">‹ 税収画面へ</a><div><b>闇の精霊 強化シミュレーター</b><small>装備・トーテム強化計画</small></div><span class="rule-version">RULE 2026-09-22</span></header>
   <main class="sim-page">
-    <section class="sim-toolbar"><div class="system-switch"><button class="active" data-system="equipment">装備</button><button data-system="totem">トーテム</button></div><div class="sim-actions"><button>新規計算</button><button>保存条件を読込</button></div></section>
+    <section class="sim-toolbar"><div class="system-switch"><button class="active" data-system="equipment">装備</button><button data-system="totem">トーテム</button></div><div class="sim-actions"><button id="reset-levels" type="button">+9に戻す</button><button type="button" disabled title="計算機能の実装時に追加します">保存条件を読込</button></div></section>
     <section class="equipment-stage">
       <div class="mist mist-a"></div><div class="mist mist-b"></div>
       <div class="stage-copy"><span>ENHANCEMENT CHAMBER</span><h1>強化する装備を選択</h1><p>装備またはトーテムを選ぶと、条件設定の窓が開きます。</p></div>
       <div class="character-wrap"><div class="character-halo"></div><img src="/enhancement/character-silhouette.webp" alt="暗い人物シルエット"></div>
       <div class="equipment-panel"><h2>装備</h2><div class="slot-grid equipment-grid">${slots.map(gearButton).join("")}</div></div>
       <div class="accessory-panel"><h2>アクセサリー <small>今後追加</small></h2><div class="slot-grid accessory-grid">${accessories.map(accessoryButton).join("")}</div></div>
-      <button class="totem-slot" data-item="totem" data-name="トーテム"><span class="totem-glow"></span><img src="/enhancement/raven-totem.webp" alt="鳥型トーテム"><span><b>トーテム</b><small>強化シミュレーション</small></span></button>
+      <button class="totem-slot" data-item="totem" data-name="トーテム"><span class="totem-level">+9</span><span class="totem-glow"></span><img src="/enhancement/raven-totem.webp" alt="鳥型トーテム"><span><b>トーテム</b><small>強化シミュレーション</small></span></button>
     </section>
   </main>
   <dialog id="enhancement-dialog" class="enhancement-dialog"><form method="dialog" class="dialog-shell"><header><div><small id="dialog-type">EQUIPMENT</small><h2 id="dialog-title">メイン武器</h2></div><button class="dialog-close" value="cancel" aria-label="閉じる">×</button></header>

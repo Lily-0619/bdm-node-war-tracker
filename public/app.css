@@ -156,6 +156,9 @@ table.master input.w44{width:44px;text-align:center;}
 /* SaverStats */
 .stats-entry{color:#fff;text-decoration:none;font-size:20px;line-height:1;margin-left:5px;padding:3px 7px;border-radius:50%;}
 .stats-entry:hover{background:rgba(255,255,255,.18);}
+.enhancement-entry{display:inline-grid;place-items:center;width:34px;height:30px;margin-left:1px;border-radius:50%;transition:.16s ease;}
+.enhancement-entry:hover{background:rgba(255,255,255,.18);transform:translateY(-1px)}
+.enhancement-entry img{display:block;width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 0 4px #c184ff)}
 .stats-home{color:#fff;text-decoration:none;}
 .stats-page{background:#f4f7f5;}
 .stats-wrap{max-width:1800px;margin:0 auto;padding:22px;}

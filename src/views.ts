@@ -171,6 +171,7 @@ export function renderPage(d: PageData): string {
         : '<a class="chip" href="/login" style="color:#fff;text-decoration:none">閲覧のみ（ログイン）</a>'
       : ""}
   <a class="stats-entry" href="/saver-stats" title="SaverStats 推移" aria-label="SaverStats 推移">⚙</a>
+  <a class="enhancement-entry" href="/enhancement-simulator" title="強化シミュレーター" aria-label="強化シミュレーター"><img src="/enhancement/shadow-spirit-soft.webp" alt=""></a>
 </div>
 
 <div class="toolbar">

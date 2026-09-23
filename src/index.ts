@@ -11,6 +11,7 @@ import {
 import { fullWorkbook, initialHoldingsTemplateCsv } from "./export";
 import { Ctx, Router, html, json, redirect, setCookieHeader, text } from "./router";
 import { renderLogin, renderPage } from "./views";
+import { renderEnhancementSimulator } from "./enhancement";
 import {
   loadSaverStats, renderSaverStatsPage, saverJsonError, saverWorkbook,
   saveSaverSnapshots, validSaverPayload,
@@ -137,6 +138,8 @@ router.get("/", async (c) => {
 });
 
 router.get("/login", () => html(renderLogin()));
+
+router.get("/enhancement-simulator", () => html(renderEnhancementSimulator()));
 
 router.post("/login", async (c) => {
   const form = await c.formData();

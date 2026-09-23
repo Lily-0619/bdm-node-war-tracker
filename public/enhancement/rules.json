@@ -1,0 +1,55 @@
+{
+  "ruleVersion": "2026-09-22",
+  "equipment": {
+    "attemptSilver": 500,
+    "attemptSeconds": 0.6,
+    "stages": [
+      { "fromStage": 0, "toStage": 1, "successRate": 1.0, "pityFailures": 0 },
+      { "fromStage": 1, "toStage": 2, "successRate": 0.6, "pityFailures": 2, "provisional": true },
+      { "fromStage": 2, "toStage": 3, "successRate": 0.4, "pityFailures": 2 },
+      { "fromStage": 3, "toStage": 4, "successRate": 0.2, "pityFailures": 3 },
+      { "fromStage": 4, "toStage": 5, "successRate": 0.1, "pityFailures": 5 },
+      { "fromStage": 5, "toStage": 6, "successRate": 0.07, "pityFailures": 8 },
+      { "fromStage": 6, "toStage": 7, "successRate": 0.05, "pityFailures": 10 },
+      { "fromStage": 7, "toStage": 8, "successRate": 0.03, "pityFailures": 17 },
+      { "fromStage": 8, "toStage": 9, "successRate": 0.01, "pityFailures": 50 },
+      { "fromStage": 9, "toStage": 10, "successRate": 0.005, "pityFailures": 100 }
+    ],
+    "restoration": {
+      "ticketsPerAttempt": 200,
+      "successRate": 0.5,
+      "seconds": 0.6,
+      "defaultValuationPrice": 528
+    },
+    "boosters": {
+      "valksI": { "label": "ヴォルクスI", "multiplier": 1.1 },
+      "akhramV": { "label": "アクラムV", "multiplier": 1.5 },
+      "valksV": { "label": "ヴォルクスV", "multiplier": 1.5, "unlockUnconfirmed": true },
+      "akhramX": { "label": "アクラムX", "multiplier": 2.0 }
+    }
+  },
+  "totem": {
+    "attemptSeconds": 0.6,
+    "stages": [
+      { "fromStage": 0, "toStage": 1, "successRate": 0.7, "pityFailures": null },
+      { "fromStage": 1, "toStage": 2, "successRate": 0.6, "pityFailures": null },
+      { "fromStage": 2, "toStage": 3, "successRate": 0.5, "pityFailures": 2 },
+      { "fromStage": 3, "toStage": 4, "successRate": 0.3, "pityFailures": 3 },
+      { "fromStage": 4, "toStage": 5, "successRate": 0.15, "pityFailures": 5 },
+      { "fromStage": 5, "toStage": 6, "successRate": 0.1, "pityFailures": 8 },
+      { "fromStage": 6, "toStage": 7, "successRate": 0.05, "pityFailures": 10 },
+      { "fromStage": 7, "toStage": 8, "successRate": 0.03, "pityFailures": 17 },
+      { "fromStage": 8, "toStage": 9, "successRate": 0.02, "pityFailures": 50 },
+      { "fromStage": 9, "toStage": 10, "successRate": 0.01, "pityFailures": 100 }
+    ],
+    "guaranteedSeven": { "fromStage": 6, "toStage": 7, "materials": 3700 },
+    "ogier": {
+      "fromStage": 9,
+      "toStage": 10,
+      "perFailure": 10,
+      "defaultPrice": 12500000,
+      "defaultBuyLimitPrice": 13000000,
+      "weeklyExpectedFree": 0.8
+    }
+  }
+}

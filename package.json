@@ -7,7 +7,8 @@
     "deploy": "wrangler deploy",
     "db:init": "wrangler d1 migrations apply kyoten --remote",
     "db:init:local": "wrangler d1 migrations apply kyoten --local",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:enhancement": "node tests/enhancement-engine.test.mjs"
   },
   "dependencies": {},
   "devDependencies": {

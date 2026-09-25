@@ -1,3 +1,4 @@
+2026-09-24　W Phoenix　L Unity, VainqueurJP, 黒の太陽
 2026-09-17　W 黒の太陽　L Unity, xAEGISx, シェイド
 2026-09-10　W 黒の太陽　L Unity, xAEGISx, ーリベリオンー
 2026-09-03　W xAEGISx　L シェイド, 黄昏のえりしおん, 黒の太陽

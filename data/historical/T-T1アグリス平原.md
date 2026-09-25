@@ -1,3 +1,4 @@
+2026-09-24　W 柿一門　L Elemento, Revenant, VIRULENT死, 厶pocalypse
 2026-09-17　W 柿一門　L Elemento, Restart, Revenant, 厶pocalypse
 2026-09-10　W 柿一門　L Elemento, Revenant, ーEspoirー, 厶pocalypse
 2026-09-03　W 厶pocalypse　L Elemento, SanctaTerra

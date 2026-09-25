@@ -1,3 +1,4 @@
+2026-09-24　W 天機　L 氣噗噗讓玻璃心碎一地
 2026-09-17　W 氣噗噗讓玻璃心碎一地　L Maverickz, Pandora, ZirconiA, 天機
 2026-09-10　W 天機　L Astrklotho, 氣噗噗讓玻璃心碎一地
 2026-09-03　W 氣噗噗讓玻璃心碎一地　L Pandora, Restart, 天機, 柿一門

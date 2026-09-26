@@ -1,3 +1,4 @@
+2026-09-25　W ーリベリオンー　L 一SUN一, 美孚冰室
 2026-09-18　W ーリベリオンー　L Orzeca, 厶pocalypse
 2026-09-11　W 厶pocalypse　L Elemento, ーリベリオンー
 2026-09-04　W ーリベリオンー　L 柿一門

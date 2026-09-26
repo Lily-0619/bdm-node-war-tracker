@@ -1,3 +1,4 @@
+2026-09-25　W オアシスステップ　L FLORISTS, xAEGISx
 2026-09-18　W ーArch　L FLORISTS, オアシスステップ
 2026-09-11　W オアシスステップ　L FLORISTS, Restart
 2026-09-04　W オアシスステップ　L FLORISTS, シェイド

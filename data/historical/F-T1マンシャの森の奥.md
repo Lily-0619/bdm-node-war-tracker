@@ -1,3 +1,4 @@
+2026-09-25　W ーArch　L Pandora
 2026-09-18　W Pandora　L 阿公店
 2026-09-11　W 阿公店　L 放置無言出入自由
 2026-09-04　W ーArch　L cobraXverse, 微笑Party

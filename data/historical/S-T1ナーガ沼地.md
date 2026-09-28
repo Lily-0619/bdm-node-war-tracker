@@ -1,3 +1,4 @@
+2026-09-27　W 美孚冰室　L MelonEmpire, 微笑Party
 2026-09-20　W MelonEmpire　L Kopitiam, 亗Luxúria亗
 2026-09-13　W MelonEmpire　L Kopitiam, 亗Luxúria亗
 2026-09-06　W MelonEmpire　L Kopitiam, 亗Luxúria亗

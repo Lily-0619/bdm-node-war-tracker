@@ -1,3 +1,4 @@
+2026-09-27　W 厶pocalypse　L Elemento, PokemonGO
 2026-09-20　W PokemonGO　L SERENITY
 2026-09-13　W ーリベリオンー　L Demise
 2026-09-06　W オアシスステップ　L DEMIIGODS혼혈, Elemento

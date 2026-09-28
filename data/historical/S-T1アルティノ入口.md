@@ -1,3 +1,4 @@
+2026-09-27　W MÏRÃGË　L SERENITY, 阿公店
 2026-09-20　W ーArch　L Elemento, 低調時尚, 厶pocalypse, 柿一門
 2026-09-13　W Elemento　L CRUSHSA, MÏRÃGË, Revenant, 厶pocalypse
 2026-09-06　W ーArch　L FLORISTS, Revenant, ZirconiA, 黄昏のえりしおん

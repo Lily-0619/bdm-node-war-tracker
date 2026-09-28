@@ -1,3 +1,4 @@
+2026-09-27　W Pandora　L xAEGISx, 黒の太陽
 2026-09-20　W xAEGISx　L 一SPY乂FäMILY一, 神聖堂
 2026-09-13　W ーArch　L シェイド, 美孚冰室
 2026-09-06　W 美孚冰室　L Orzeca, 微笑Party

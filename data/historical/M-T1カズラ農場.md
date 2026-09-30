@@ -1,3 +1,4 @@
+2026-09-28　W 亗Luxúria亗　L Kopitiam, MelonEmpire, Restart, 柿一門
 2026-09-21　W 亗Luxúria亗　L Kopitiam, 柿一門
 2026-09-14　W 亗Luxúria亗　L Elemento, Kopitiam, MelonEmpire, 厶pocalypse
 2026-09-07　W 亗Luxúria亗　L KOMADRONA, MelonEmpire, Restart, 柿一門

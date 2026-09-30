@@ -1,3 +1,4 @@
+2026-09-28　W 一SUN一　L Orzeca, シェイド
 2026-09-21　W シェイド　L Phoenix, xAEGISx
 2026-09-14　W Phoenix　L 
 2026-09-07　W Phoenix　L xAEGISx, ーArch

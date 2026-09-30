@@ -1,3 +1,4 @@
+2026-09-28　W ZirconiA　L 厶pocalypse, 放置無言出入自由
 2026-09-21　W ーリベリオンー　L 微笑Party, 美孚冰室
 2026-09-14　W 美孚冰室　L Demise, 微笑Party
 2026-09-07　W Elemento　L 厶pocalypse

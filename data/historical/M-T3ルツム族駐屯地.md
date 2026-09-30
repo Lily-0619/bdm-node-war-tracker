@@ -1,3 +1,4 @@
+2026-09-28　W RaиkSS　L 微笑Party, 當惡魔遇到殺手貓
 2026-09-21　W 當惡魔遇到殺手貓　L 一SUN一
 2026-09-14　W RaиkSS　L PokemonGO, 當惡魔遇到殺手貓
 2026-09-07　W PokemonGO　L cobraXverse, 微笑Party, 當惡魔遇到殺手貓, 美孚冰室

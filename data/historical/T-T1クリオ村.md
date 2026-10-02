@@ -1,3 +1,4 @@
+2026-10-01　W PokemonGO　L ーArch, 阿公店
 2026-09-24　W Pandora　L FLORISTS, 美孚冰室
 2026-09-17　W ーArch　L FLORISTS, REGENCY彡
 2026-09-10　W ーArch　L FLORISTS, 雲淡風輕o

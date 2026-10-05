@@ -1,3 +1,5 @@
+2026-10-11　W シェイド　L 
+2026-10-04　W シェイド　L Pandora, ーArch
 2026-09-27　W Pandora　L xAEGISx, 黒の太陽
 2026-09-20　W xAEGISx　L 一SPY乂FäMILY一, 神聖堂
 2026-09-13　W ーArch　L シェイド, 美孚冰室

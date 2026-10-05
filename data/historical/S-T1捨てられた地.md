@@ -1,3 +1,5 @@
+2026-10-11　W ーリベリオンー　L 
+2026-10-04　W ーリベリオンー　L Elemento, 厶pocalypse
 2026-09-27　W 厶pocalypse　L Elemento, PokemonGO
 2026-09-20　W PokemonGO　L SERENITY
 2026-09-13　W ーリベリオンー　L Demise

@@ -1,3 +1,4 @@
+2026-10-05　W 黒の太陽　L Restart, 微笑Party
 2026-09-28　W 黒の太陽　L FLORISTS, 神聖堂
 2026-09-21　W FLORISTS　L Restart, ー麒麟ー
 2026-09-14　W FLORISTS　L シェイド, 一SUN一

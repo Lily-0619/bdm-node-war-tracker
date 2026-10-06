@@ -1,3 +1,4 @@
+2026-10-05　W 柿一門　L FLORISTS, Pandora, xAEGISx, ーEspoirー
 2026-09-28　W xAEGISx　L ーEspoirー, 低調時尚, 破釜酒吧
 2026-09-21　W 低調時尚　L Revenant, RëBîrth
 2026-09-14　W Pandora　L ーEspoirー, 柿一門

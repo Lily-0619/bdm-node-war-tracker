@@ -1,4 +1,5 @@
 2026-10-11　W Orzeca　L 
+2026-10-04　W Orzeca　L 一SUN一
 2026-09-27　W Orzeca　L 一SUN一
 2026-09-20　W Döraè่mön　L 
 2026-09-13　W Döraè่mön　L xAEGISx

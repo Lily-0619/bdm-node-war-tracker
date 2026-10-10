@@ -1,3 +1,4 @@
+2026-10-09　W MelonEmpire　L Kopitiam, 亗Luxúria亗
 2026-10-02　W MelonEmpire　L ーリベリオンー, 亗Luxúria亗
 2026-09-25　W ーリベリオンー　L 一SUN一, 美孚冰室
 2026-09-18　W ーリベリオンー　L Orzeca, 厶pocalypse

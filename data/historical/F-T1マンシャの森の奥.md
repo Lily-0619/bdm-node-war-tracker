@@ -1,3 +1,4 @@
+2026-10-09　W 氣噗噗讓玻璃心碎一地　L Pandora, 低調時尚
 2026-10-02　W 低調時尚　L PokemonGO, ーArch
 2026-09-25　W ーArch　L Pandora
 2026-09-18　W Pandora　L 阿公店

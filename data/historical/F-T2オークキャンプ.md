@@ -1,3 +1,4 @@
+2026-10-09　W TRAITORs　L 歐皇
 2026-10-02　W TRAITORs　L 柿一門
 2026-09-25　W VainqueurJP　L 
 2026-09-18　W VainqueurJP　L 

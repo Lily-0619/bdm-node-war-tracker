@@ -1,3 +1,4 @@
+2026-10-09　W xAEGISx　L ZirconiA, ひよこりあ, 微笑Party, 黄昏のえりしおん
 2026-10-02　W 黄昏のえりしおん　L Restart, xAEGISx, ーEspoirー, 義勇
 2026-09-25　W ーEspoirー　L Astrklotho, Restart, obIivion
 2026-09-18　W ーEspoirー　L Lullàby, ひよこりあ, 桜吹雪, 義勇

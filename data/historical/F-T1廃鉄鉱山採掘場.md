@@ -1,3 +1,4 @@
+2026-10-09　W ーArch　L 
 2026-10-02　W TнэÖяdeг　L cobraXverse, 微笑Party
 2026-09-25　W 微笑Party　L cobraXverse
 2026-09-18　W 微笑Party　L cobraXverse, 柿一門

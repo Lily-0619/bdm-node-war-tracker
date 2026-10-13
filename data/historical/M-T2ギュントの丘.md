@@ -1,3 +1,4 @@
+2026-10-12　W Phoenix　L VainqueurJP, 黒の太陽
 2026-10-05　W Unity　L Orzeca, 一SUN一
 2026-09-28　W 一SUN一　L Orzeca, シェイド
 2026-09-21　W シェイド　L Phoenix, xAEGISx

@@ -335,10 +335,15 @@
     if (el("stats-from").value) query.set("from", el("stats-from").value);
     if (el("stats-to").value) query.set("to", el("stats-to").value);
     const response = await fetch("/api/saver-stats?" + query);
+    if (!response.headers.get("content-type")?.includes("application/json")) {
+      throw new Error(`職推移データを取得できませんでした（HTTP ${response.status}）。時間をおいて再度お試しください。`);
+    }
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "取得に失敗しました");
     await loadClassColors();
     loaded = data; render();
+    el("stats-error").hidden = true;
+    el("stats-error").textContent = "";
   }
 
   function showError(error) {

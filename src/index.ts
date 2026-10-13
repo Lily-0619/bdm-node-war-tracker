@@ -556,6 +556,10 @@ export default {
       if (env.ASSETS) return env.ASSETS.fetch(req);
       return text("Not Found", 404);
     } catch (e) {
+      if (new URL(req.url).pathname.startsWith("/api/")) {
+        console.error("API request failed", e);
+        return json({ ok: false, error: "データの取得・処理に失敗しました。時間をおいて再度お試しください。" }, 500);
+      }
       const msg = e instanceof Error ? `${e.message}\n${e.stack ?? ""}` : String(e);
       return new Response(
         `<!DOCTYPE html><meta charset="utf-8"><body style="font-family:sans-serif;padding:24px">

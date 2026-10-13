@@ -98,11 +98,14 @@ export async function loadSaverStats(db: D1Database, from?: string, to?: string)
     ? await stmt.bind(from, to).all<SaverSnapshotRow>() : await stmt.all<SaverSnapshotRow>();
   const snapshots = snaps.results ?? [];
   if (!snapshots.length) return { snapshots, classes: [] as SaverClassRow[] };
-  const ids = snapshots.map((s) => s.id);
-  const placeholders = ids.map(() => "?").join(",");
-  const classes = await db.prepare(
-    `SELECT snapshot_id,class_name,player_count,sort_order FROM saver_stats_classes WHERE snapshot_id IN (${placeholders}) ORDER BY sort_order,class_name`
-  ).bind(...ids).all<SaverClassRow>();
+  // Keep bound parameters below D1's limit as history grows.
+  const classStmt = db.prepare(
+    "SELECT snapshot_id,class_name,player_count,sort_order FROM saver_stats_classes" +
+    " WHERE snapshot_id IN (SELECT id FROM saver_stats_snapshots" + where + ")" +
+    " ORDER BY sort_order,class_name"
+  );
+  const classes = from && to
+    ? await classStmt.bind(from, to).all<SaverClassRow>() : await classStmt.all<SaverClassRow>();
   return { snapshots, classes: classes.results ?? [] };
 }
 

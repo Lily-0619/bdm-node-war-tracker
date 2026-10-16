@@ -1,3 +1,4 @@
+2026-10-15　W FLORISTS　L 柿一門, 阿公店
 2026-10-08　W FLORISTS　L Elemento, ZirconiA, 低調時尚, 雲淡風輕o
 2026-10-01　W Revenant　L Elemento, ZirconiA, 厶pocalypse, 柿一門
 2026-09-24　W 柿一門　L Elemento, Revenant, VIRULENT死, 厶pocalypse

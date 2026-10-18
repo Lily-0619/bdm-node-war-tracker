@@ -1,3 +1,4 @@
+2026-10-18　W RaиkSS　L VainqueurJP
 2026-10-11　W Orzeca　L 
 2026-10-04　W Orzeca　L 一SUN一
 2026-09-27　W Orzeca　L 一SUN一

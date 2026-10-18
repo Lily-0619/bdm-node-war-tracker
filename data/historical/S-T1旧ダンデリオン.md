@@ -1,3 +1,4 @@
+2026-10-18　W Unity　L 黒の太陽
 2026-10-11　W シェイド　L 
 2026-10-04　W シェイド　L Pandora, ーArch
 2026-09-27　W Pandora　L xAEGISx, 黒の太陽

@@ -1,3 +1,4 @@
+2026-10-18　W オアシスステップ　L SERENITY, ーEspoirー, ー麒麟ー, 義勇
 2026-10-11　W ZirconiA　L 
 2026-10-04　W ZirconiA　L オアシスステップ, ーEspoirー, ー麒麟ー, 義勇
 2026-09-27　W 黄昏のえりしおん　L Restart, オアシスステップ, ー麒麟ー, 義勇

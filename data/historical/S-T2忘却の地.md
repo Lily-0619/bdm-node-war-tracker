@@ -1,3 +1,4 @@
+2026-10-18　W xAEGISx　L 放置無言出入自由
 2026-10-11　W Döraè่mön　L 
 2026-10-04　W Döraè่mön　L FLORISTS, TRAITORs
 2026-09-27　W TRAITORs　L ZirconiA

@@ -1,3 +1,4 @@
+2026-10-18　W ーリベリオンー　L 雲淡風輕o
 2026-10-11　W ーリベリオンー　L 
 2026-10-04　W ーリベリオンー　L Elemento, 厶pocalypse
 2026-09-27　W 厶pocalypse　L Elemento, PokemonGO

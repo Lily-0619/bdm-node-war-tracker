@@ -1,3 +1,4 @@
+2026-10-18　W Revenant　L FLORISTS, 厶pocalypse, 黄昏のえりしおん
 2026-10-11　W Revenant　L 
 2026-10-04　W Revenant　L MÏRÃGË, 微笑Party, 柿一門, 黄昏のえりしおん
 2026-09-27　W MÏRÃGË　L SERENITY, 阿公店

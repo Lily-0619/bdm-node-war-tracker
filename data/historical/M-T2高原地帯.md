@@ -1,3 +1,4 @@
+2026-10-19　W Orzeca　L 
 2026-10-12　W Orzeca　L 
 2026-09-28　W Döraè่mön　L Demise, cobraXverse
 2026-09-21　W Demise　L 

@@ -1,3 +1,4 @@
+2026-10-19　W Pandora　L RëBîrth, 厶pocalypse, 美孚冰室
 2026-10-12　W 厶pocalypse　L 低調時尚, 放置無言出入自由, 柿一門, 桜吹雪
 2026-10-05　W 柿一門　L FLORISTS, Pandora, xAEGISx, ーEspoirー
 2026-09-28　W xAEGISx　L ーEspoirー, 低調時尚, 破釜酒吧

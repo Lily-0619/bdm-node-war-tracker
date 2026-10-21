@@ -1,3 +1,4 @@
+2026-10-19　W FLORISTS　L ZirconiA, 黄昏のえりしおん
 2026-10-12　W ZirconiA　L Pandora, ーリベリオンー
 2026-10-05　W 黒の太陽　L Restart, 微笑Party
 2026-09-28　W 黒の太陽　L FLORISTS, 神聖堂

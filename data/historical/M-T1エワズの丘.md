@@ -1,3 +1,4 @@
+2026-10-19　W ーリベリオンー　L cobraXverse, 微笑Party
 2026-10-12　W 微笑Party　L 美孚冰室, 阿公店
 2026-10-05　W 阿公店　L obIivion
 2026-09-28　W ZirconiA　L 厶pocalypse, 放置無言出入自由

@@ -1,3 +1,4 @@
+2026-10-22　W Kopitiam　L MelonEmpire, 亗Luxúria亗
 2026-10-15　W Kopitiam　L MelonEmpire, 亗Luxúria亗
 2026-10-08　W Kopitiam　L MelonEmpire, 亗Luxúria亗
 2026-10-01　W Kopitiam　L MelonEmpire, 亗Luxúria亗

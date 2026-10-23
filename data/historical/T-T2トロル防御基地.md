@@ -1,3 +1,4 @@
+2026-10-22　W 黒の太陽　L Unity, シェイド, ーリベリオンー
 2026-10-15　W シェイド　L Phoenix, ーリベリオンー, 黒の太陽
 2026-10-08　W 黒の太陽　L Phoenix, Unity, ーArch
 2026-10-01　W Phoenix　L Unity, ーリベリオンー, 黒の太陽

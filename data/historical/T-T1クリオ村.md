@@ -1,3 +1,4 @@
+2026-10-22　W Pandora　L FLORISTS, SERENITY
 2026-10-15　W PokemonGO　L 低調時尚, 厶pocalypse
 2026-10-08　W PokemonGO　L 
 2026-10-01　W PokemonGO　L ーArch, 阿公店

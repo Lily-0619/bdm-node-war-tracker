@@ -1,3 +1,4 @@
+2026-10-23　W xAEGISx　L Restart, 雲淡風輕o
 2026-10-16　W TRAITORs　L 微笑Party
 2026-10-09　W TRAITORs　L 歐皇
 2026-10-02　W TRAITORs　L 柿一門

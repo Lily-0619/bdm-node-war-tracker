@@ -1,3 +1,4 @@
+2026-10-23　W ーリベリオンー　L 低調時尚
 2026-10-16　W 低調時尚　L Outlawss, obIivion
 2026-10-09　W ーArch　L 
 2026-10-02　W TнэÖяdeг　L cobraXverse, 微笑Party

@@ -1,3 +1,4 @@
+2026-10-23　W VainqueurJP　L 星隕
 2026-10-16　W 星隕　L 
 2026-10-09　W Phoenix　L 
 2026-10-02　W Unity　L 

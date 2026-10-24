@@ -1,3 +1,4 @@
+2026-10-23　W ーArch　L Kopitiam, MelonEmpire
 2026-10-16　W MelonEmpire　L Kopitiam, 亗Luxúria亗
 2026-10-09　W MelonEmpire　L Kopitiam, 亗Luxúria亗
 2026-10-02　W MelonEmpire　L ーリベリオンー, 亗Luxúria亗

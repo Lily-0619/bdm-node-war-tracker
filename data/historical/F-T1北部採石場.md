@@ -1,3 +1,4 @@
+2026-10-23　W 柿一門　L Astrklotho, cobraXverse, ーEspoirー, 美孚冰室
 2026-10-16　W ーEspoirー　L Astrklotho, Pandora, ZirconiA, 破釜酒吧
 2026-10-09　W xAEGISx　L ZirconiA, ひよこりあ, 微笑Party, 黄昏のえりしおん
 2026-10-02　W 黄昏のえりしおん　L Restart, xAEGISx, ーEspoirー, 義勇

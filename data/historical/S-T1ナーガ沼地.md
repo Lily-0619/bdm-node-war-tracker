@@ -1,3 +1,4 @@
+2026-10-25　W 亗Luxúria亗　L Kopitiam, MelonEmpire
 2026-10-18　W 亗Luxúria亗　L Kopitiam, 美孚冰室
 2026-10-11　W 美孚冰室　L 
 2026-10-04　W 美孚冰室　L SERENITY, cobraXverse

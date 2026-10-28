@@ -1,3 +1,4 @@
+2026-10-25　W ーEspoirー　L ZirconiA, オアシスステップ, 一VaяgапD, 厶pocalypse
 2026-10-18　W オアシスステップ　L SERENITY, ーEspoirー, ー麒麟ー, 義勇
 2026-10-11　W ZirconiA　L 
 2026-10-04　W ZirconiA　L オアシスステップ, ーEspoirー, ー麒麟ー, 義勇

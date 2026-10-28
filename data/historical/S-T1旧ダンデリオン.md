@@ -1,3 +1,4 @@
+2026-10-25　W Pandora　L Phoenix, ーArch
 2026-10-18　W Unity　L 黒の太陽
 2026-10-11　W シェイド　L 
 2026-10-04　W シェイド　L Pandora, ーArch

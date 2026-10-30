@@ -8,3 +8,5 @@ dist/
 *.log
 .env
 data/class_button/
+
+.verification/

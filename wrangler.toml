@@ -6,6 +6,8 @@ compatibility_flags = ["nodejs_compat"]
 # 静的ファイル（app.css / app.js）
 [assets]
 directory = "./public"
+run_worker_first = true
+binding = "ASSETS"
 
 # D1（database_id は `wrangler d1 create kyoten` の出力を貼る）
 [[d1_databases]]

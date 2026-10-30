@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import { build } from 'esbuild';
+await build({entryPoints:['src/index.ts'],bundle:true,platform:'node',format:'esm',outfile:'.verification/worker.mjs'});
+const {default:worker}=await import('../.verification/worker.mjs');
+let dbCalls=0,assetCalls=0;
+const env={DB:{prepare(){dbCalls++;return {all:async()=>({results:[]})};}},ASSETS:{fetch(){assetCalls++;return new Response('asset');}}};
+const request=(path,method='GET')=>worker.fetch(new Request('https://test.local'+path,{method}),env);
+const home=await request('/');assert.equal(home.status,200);const body=await home.text();assert.match(body,/メンテナンス中/);assert.match(body,/enhancement-simulator/);assert.match(body,/saver-stats/);assert.equal(dbCalls,0);
+for(const path of ['/export.xlsx','/export/initial-template.csv','/login','/logout','/app.js','/archives/season1/src/index.ts','/data/node_master.csv','/config/legacy_rules.json'])assert.equal((await request(path)).status,404,path);
+for(const path of ['/api/week/save','/api/node','/api/guild','/api/guild/import','/api/initial-holding','/api/initial-holding/import'])assert.equal((await request(path,'POST')).status,410,path);
+assert.equal((await request('/api/eligible/1')).status,410);assert.equal(dbCalls,0);assert.equal(assetCalls,0);
+assert.match(await (await request('/enhancement-simulator')).text(),/闇の精霊/);
+assert.match(await (await request('/saver-stats')).text(),/SaverStats/);
+const stats=await request('/api/saver-stats');assert.equal(stats.status,200);assert.deepEqual(await stats.json(),{snapshots:[],classes:[]});
+assert.equal((await request('/api/saver-stats/ingest','POST')).status,401);
+for(const p of ['/enhancement.js','/enhancement-engine.js','/enhancement-worker.js','/enhancement/rules.json','/app.css','/saver-stats.js','/class-button/WR.svg'])assert.equal((await request(p)).status,200,p);
+assert.equal(assetCalls,7);assert.equal((await request('/healthz')).status,200);console.log('PASS: maintenance, isolated tax routes, active simulators, SaverStats, asset allowlist');
